@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 require('dotenv').config(); // 👈 This loads the secret notes
 
-const DB_URL = process.env.MONGODB_URI;
+const DB_URL = process.env.DB_URL;
 
 async function makeAdmin(email) {
     try {
