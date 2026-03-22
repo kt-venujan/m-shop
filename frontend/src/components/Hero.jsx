@@ -18,7 +18,7 @@ export default function Hero({ settings, selectedCategory, setSelectedCategory }
 
   return (
     <div className="flex flex-col w-full">
-    <div className="relative bg-black overflow-hidden w-full h-[600px] flex flex-col justify-center items-center">
+    <div className="relative bg-black overflow-hidden w-full min-h-[500px] md:min-h-[600px] py-16 flex flex-col justify-center items-center">
       {/* Background Image Slider */}
       <div className="absolute inset-0 bg-black">
         {bgImages.map((src, index) => (

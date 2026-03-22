@@ -38,10 +38,10 @@ export default function Footer() {
       </div>
 
       <div data-aos="fade-up" className="bg-[#f8f9fa] border-t border-gray-200 py-4 w-full md:block z-10 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-end items-center gap-4">
-          <span className="text-[#0a4275] font-medium text-[16px] tracking-wide">Payment Methods</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-center md:justify-end items-center gap-4">
+          <span className="text-[#0a4275] font-medium text-[16px] tracking-wide mb-2 md:mb-0">Payment Methods</span>
           
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-wrap justify-center gap-2 items-center">
             {/* Cash on Delivery */}
             <div className="flex flex-col items-center justify-center bg-white border border-gray-200 w-[52px] h-8 rounded-[3px]">
               <span className="text-[6px] font-black text-[#15803d] leading-none uppercase tracking-tighter">CASH ON</span>

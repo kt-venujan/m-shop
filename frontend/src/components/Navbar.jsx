@@ -95,13 +95,14 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
 
           {user ? (
             <div className="relative group cursor-pointer z-50">
               <div className="flex items-center gap-1 font-bold text-black hover:text-orange-600 transition-all uppercase tracking-wide text-sm py-2">
-                <span>{user.name}'S ACCOUNT</span>
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                <span className="hidden sm:inline">{user.name}'S ACCOUNT</span>
+                <svg className="w-6 h-6 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </div>
               
               {/* Dropdown Menu */}
@@ -136,34 +137,72 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
             </div>
           ) : (
             <Link to="/auth" className="font-bold text-black hover:text-orange-600 transition-colors uppercase tracking-wide text-sm relative group overflow-hidden py-2">
-              <span className="relative z-10">Sign In</span>
+              <span className="hidden sm:inline relative z-10">Sign In</span>
+              <svg className="w-6 h-6 sm:hidden relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
             </Link>
           )}
 
           <Link to="/cart" className="font-bold text-black hover:text-orange-600 flex items-center gap-1 transition-all hover:scale-105 duration-300 uppercase tracking-wide text-sm group">
-            Cart 
+            <span className="hidden sm:inline">Cart</span>
+            <svg className="w-6 h-6 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             <span className={`text-orange-600 transition-all duration-300 ${cartCount > 0 ? 'inline-block transform scale-110 font-black drop-shadow-sm group-hover:-translate-y-1' : ''}`}>( {cartCount} )</span>
           </Link>
+        </div>
+      </div>
+      
+      {/* Mobile Search Bar */}
+      <div className="md:hidden w-full px-4 pb-4 bg-white">
+        <div className="relative w-full group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+            <svg className="h-5 w-5 text-orange-600 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearch}
+            onFocus={() => setShowSuggestions(true)}
+            className="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-full leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 focus:bg-white text-sm transition-all duration-300 shadow-sm relative z-10"
+            placeholder="Search products..."
+          />
+          
+          {/* Mobile Suggestions */}
+          {showSuggestions && searchTerm.trim() !== '' && suggestions.length > 0 && (
+            <div className="absolute top-[100%] left-0 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 overflow-hidden mt-1">
+              {suggestions.map((product, index) => (
+                <div
+                  key={product._id}
+                  onClick={() => handleSuggestionClick(product)}
+                  className="px-5 py-3 cursor-pointer active:bg-orange-50 transition-colors flex items-center"
+                >
+                  <span className={`text-[14px] ${index === 0 ? 'text-orange-500' : 'text-gray-600'} transition-colors`}>
+                    {product.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       </header>
 
       {/* Bottom Shelf (Categories) */}
-      <div className="bg-black/40 backdrop-blur-md border-t border-b border-white/10 shadow-lg relative z-40">
+      <div className="bg-black/40 backdrop-blur-md border-t border-b border-white/10 shadow-lg relative z-40 overflow-x-auto hide-scrollbar">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex justify-center space-x-6 md:space-x-12 py-1 overflow-visible">
+          <nav className="flex justify-start md:justify-center space-x-6 md:space-x-12 py-1 overflow-visible whitespace-nowrap lg:whitespace-normal">
             {['Electronics', 'Clothing', 'Home & Garden', 'Beauty', 'Sports'].map(category => {
               const categoryProducts = products.filter(p => p.category === category).slice(0, 3);
               return (
                 <div key={category} className="group relative">
-                  <a href="#" className="flex items-center text-sm text-white font-bold hover:text-orange-400 transition-colors whitespace-nowrap tracking-wide py-4 relative z-10 drop-shadow">
+                  <Link to="/" onClick={() => setSelectedCategory && setSelectedCategory(category)} className="flex items-center text-sm text-white font-bold hover:text-orange-400 transition-colors whitespace-nowrap tracking-wide py-4 relative z-10 drop-shadow">
                     {category}
-                    <svg className="ml-1 w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                  </a>
+                    <svg className="ml-1 w-4 h-4 opacity-70 group-hover:rotate-180 transition-transform duration-300 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </Link>
 
                   {/* Auto-Expanding Dropdown List */}
-                  <div className="absolute top-[100%] left-1/2 -translate-x-1/2 pt-2 opacity-0 translate-y-3 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 w-[240px] z-[9999]">
+                  <div className="absolute top-[100%] left-1/2 -translate-x-1/2 pt-2 opacity-0 translate-y-3 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 hidden md:block w-[240px] z-[9999]">
                     <div className="bg-white rounded-lg shadow-2xl border border-gray-100 overflow-hidden transform origin-top scale-95 group-hover:scale-100 transition-transform duration-300">
                       <div className="p-3 border-b border-gray-100 bg-gray-50/80 backdrop-blur-sm">
                         <span className="font-extrabold text-black uppercase tracking-wider text-xs">Trending: {category}</span>

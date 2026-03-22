@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 
 export default function Account({ user, handleLogout }) {
@@ -151,36 +151,36 @@ export default function Account({ user, handleLogout }) {
   const initials = user.name ? user.name.substring(0, 2).toUpperCase() : 'US';
 
   return (
-    <div data-aos="fade-up" className="max-w-6xl mx-auto my-10 bg-white shadow-xl rounded-2xl overflow-hidden flex min-h-[800px] border border-gray-100 relative">
+    <div data-aos="fade-up" className="max-w-6xl mx-auto md:my-10 bg-white md:shadow-xl md:rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-[800px] border border-gray-100 relative">
       
       {/* Sidebar Panel */}
-      <div className="w-[280px] bg-white flex-shrink-0 border-r border-[#eaedf3] p-6 flex flex-col">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
+      <div className="w-full md:w-[280px] bg-white flex-shrink-0 border-b md:border-b-0 md:border-r border-[#eaedf3] p-4 md:p-6 flex flex-col">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Settings</h2>
         
         <div className="relative mb-8 pt-1">
           <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input type="text" placeholder="Search Settings" className="w-full bg-white border border-gray-200 shadow-sm rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all text-gray-700 placeholder-gray-400" />
         </div>
 
-        <nav className="flex-1 space-y-1">
-          <button onClick={() => setActiveTab('account')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === 'account' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+        <nav className="flex-none flex md:flex-col overflow-x-auto hide-scrollbar space-x-2 md:space-x-0 md:space-y-1 pb-2 md:pb-0">
+          <button onClick={() => setActiveTab('account')} className={`flex-none md:w-full flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-[13px] md:text-sm font-semibold transition-all whitespace-nowrap ${activeTab === 'account' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             Account
           </button>
           
-          <button onClick={() => setActiveTab('orders')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === 'orders' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+          <button onClick={() => setActiveTab('orders')} className={`flex-none md:w-full flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-[13px] md:text-sm font-semibold transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             My Orders
           </button>
 
-          <button onClick={() => setActiveTab('reviews')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === 'reviews' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+          <button onClick={() => setActiveTab('reviews')} className={`flex-none md:w-full flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-[13px] md:text-sm font-semibold transition-all whitespace-nowrap ${activeTab === 'reviews' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
             My Reviews
           </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-all">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            My Returns & Cancellations
+          <button className="flex-none md:w-full flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-[13px] md:text-sm font-semibold text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-all whitespace-nowrap">
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Returns & Cancels
           </button>
         </nav>
 
@@ -193,11 +193,11 @@ export default function Account({ user, handleLogout }) {
       </div>
 
       {/* Main Content Pane */}
-      <div className="flex-1 bg-white overflow-y-auto">
+      <div className="flex-1 w-full md:w-auto bg-white overflow-y-auto">
         
         {/* Account Settings View */}
         {activeTab === 'account' && (
-          <div className="max-w-3xl mx-auto py-12 px-10">
+          <div className="w-full max-w-3xl mx-auto py-8 md:py-12 px-4 md:px-10">
             {message && <div className="mb-6 bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm font-medium border border-green-200">{message}</div>}
             
             {/* Basic Information Section */}
