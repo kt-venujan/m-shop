@@ -1,0 +1,251 @@
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
+export default function ProductDetails({ products, addToCart }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
+  const [selectedColor, setSelectedColor] = useState('A');
+  const [deliveryLocation, setDeliveryLocation] = useState('Western, Colombo 1-15, Colombo 01 - Fort');
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
+  // Scroll to top automatically when clicking a product
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  const product = products.find(p => p._id === id);
+
+  if (!product) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center">
+        <h2 className="text-3xl font-bold bg-white p-12 rounded-xl shadow-sm border border-gray-100">Product not found 🔍</h2>
+        <Link to="/" className="text-white bg-orange-600 font-bold px-6 py-3 rounded-md mt-6 shadow hover:bg-orange-700 transition-colors">Return to Home</Link>
+      </div>
+    );
+  }
+  
+  const discountPrice = typeof product.price === 'number' ? product.price : parseFloat(product.price || 0);
+  const originalPrice = discountPrice * 2; // Mock original price 50% more
+
+  const handleDecrease = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
+  const handleIncrease = () => setQuantity(prev => prev + 1);
+
+  const handleBuyNow = () => {
+    addToCart(product, quantity);
+    navigate('/checkout');
+  };
+
+  return (
+    <div className="bg-gray-50 min-h-screen pb-20">
+      {/* Breadcrumbs */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-500 font-medium">
+        <Link to="/" className="text-blue-600 hover:text-orange-600 hover:underline transition-colors">Home</Link>
+        <span className="mx-2 text-gray-400">/</span>
+        <span className="text-black">{product.category}</span>
+        <span className="mx-2 text-gray-400">/</span>
+        <span className="text-gray-500 truncate max-w-xs inline-block align-bottom">{product.name}</span>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
+          
+          {/* Top 3-Column Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
+            
+            {/* Column 1: Images (Left - width 4) */}
+            <div className="lg:col-span-4 flex flex-col items-center select-none">
+              <div className="w-full aspect-square bg-[#f2f2f2] border border-gray-100 rounded-sm overflow-hidden flex items-center justify-center mb-4 relative cursor-zoom-in group">
+                {product.image ? (
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                ) : (
+                  <span className="text-9xl drop-shadow-lg transform group-hover:scale-110 transition-transform duration-500">
+                    {product.category === 'Electronics' ? '💻' : 
+                     product.category === 'Clothing' ? '👕' : 
+                     product.category === 'Sports' ? '⚽' :
+                     product.category === 'Beauty' ? '💄' : '🛍️'}
+                  </span>
+                )}
+                
+                {/* Discount Badge overlay */}
+                <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+                  -50%
+                </div>
+              </div>
+            </div>
+            
+            {/* Column 2: Product Core Details (Center - width 5) */}
+            <div className="lg:col-span-5 flex flex-col relative">
+              <h1 className="text-[22px] font-semibold text-gray-900 leading-snug mb-3">
+                {product.name}
+              </h1>
+              
+              {/* Ratings & Brand Row */}
+              <div className="flex items-center gap-4 text-sm mb-4 pb-4">
+                <div className="flex items-center text-[#f57224] text-lg">
+                  ★★★★<span className="text-gray-300">★</span>
+                  <span className="text-blue-600 hover:text-orange-500 hover:underline ml-3 cursor-pointer text-sm">13 Ratings</span>
+                </div>
+                <div className="text-gray-300">|</div>
+                <div className="text-gray-500 text-sm">
+                  Brand: <span className="text-blue-600 hover:text-orange-500 hover:underline cursor-pointer">No Brand</span>
+                </div>
+              </div>
+
+              <div className="w-full h-px bg-gray-100 mb-4 absolute top-[110px]"></div>
+
+              {/* Pricing Block */}
+              <div className="mb-6 pt-2">
+                <div className="text-4xl font-extrabold text-[#f57224] mb-2 tracking-tight">
+                  Rs. {discountPrice.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+                </div>
+                <div className="flex items-center gap-2 text-sm pt-1">
+                  <span className="text-gray-400 line-through">Rs. {originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 0 })}</span>
+                  <span className="text-black font-extrabold">-50%</span>
+                </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <span className="text-xs text-black border border-orange-500 rounded px-2 py-0.5 whitespace-nowrap bg-orange-50">Installment</span>
+                  <span className="text-xs text-gray-600">Up to 3 months, as low as Rs. {(discountPrice/3).toFixed(0)} per month.</span>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-100 pt-6 mb-6">
+
+                 {/* Quantity Selector */}
+                 <div className="mb-8 flex items-center gap-4">
+                   <p className="text-gray-500 text-sm w-16">Quantity</p>
+                   <div className="flex items-center">
+                     <button onClick={handleDecrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-l border border-gray-300 border-r-0">-</button>
+                     <input type="text" value={quantity} readOnly className="w-12 h-9 text-center text-sm font-semibold outline-none border-y border-gray-300 pointer-events-none" />
+                     <button onClick={handleIncrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-r border border-gray-300 border-l-0">+</button>
+                   </div>
+                 </div>
+
+                 {/* Buy Buttons */}
+                 <div className="flex gap-2 sm:gap-4 mt-auto">
+                   <button 
+                     onClick={handleBuyNow}
+                     className="flex-1 bg-[#2abbe8] hover:bg-[#1bb0da] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#2abbe8] focus:ring-offset-1"
+                   >
+                     Buy Now
+                   </button>
+                   <button 
+                     onClick={() => addToCart(product, quantity)}
+                     className="flex-1 bg-[#f57224] hover:bg-[#e0621b] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#f57224] focus:ring-offset-1"
+                   >
+                     Add to Cart
+                   </button>
+                 </div>
+              </div>
+            </div>
+            
+            {/* Column 3: Logistics & Seller (Right - width 3) */}
+            <div className="lg:col-span-3 bg-[#fafafa] p-4 lg:p-0 lg:bg-transparent rounded-md lg:rounded-none flex flex-col gap-0 divide-y divide-gray-100 border border-gray-200 lg:border-none">
+              
+              {/* Delivery Options */}
+              <div className="pb-4">
+                <div className="flex justify-between items-center mb-4 lg:pr-2">
+                  <h3 className="text-xs text-gray-500 font-bold uppercase tracking-wide">Delivery Options</h3>
+                  <svg className="w-4 h-4 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                
+                <div className="flex gap-3 mb-4 items-start">
+                  <svg className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  <div className="text-sm border-r border-gray-200 pr-3 flex-1 min-w-[50%]">
+                    <p className="text-gray-800 leading-tight">{deliveryLocation}</p>
+                  </div>
+                  <button onClick={() => setShowLocationModal(true)} className="text-xs font-bold text-[#f57224] hover:text-[#e0621b] ml-auto whitespace-nowrap pt-0.5 focus:outline-none">CHANGE</button>
+                </div>
+
+                <div className="border border-gray-200 rounded divide-y divide-gray-200 bg-white shadow-sm">
+                  <div className="p-3 flex items-start gap-3">
+                    <span className="text-xl">🚚</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">Standard</p>
+                      <p className="text-[11px] text-gray-500">Guaranteed by 25-29 Mar</p>
+                    </div>
+                    <span className="text-sm font-bold text-gray-900 mt-0.5">Rs. 230</span>
+                  </div>
+                  <div className="p-3 flex items-start gap-3">
+                    <span className="text-xl">💵</span>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800 mt-1">Cash on Delivery Available</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Returns & Warranty */}
+              <div className="py-4">
+                <div className="flex justify-between items-center mb-4 lg:pr-2">
+                  <h3 className="text-xs text-gray-500 font-bold uppercase tracking-wide">Return & Warranty</h3>
+                  <svg className="w-4 h-4 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div className="space-y-4 px-1">
+                  <div className="flex items-center gap-4">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" /></svg>
+                    <span className="text-sm text-gray-800 hover:underline cursor-pointer">14 days easy return</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    <span className="text-sm text-gray-800 hover:underline cursor-pointer">6 Months Agent Warranty</span>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+          
+        </div>
+        
+        {/* NEW PRODUCT DESCRIPTION SECTION */}
+        <div className="bg-white p-6 md:p-10 rounded-lg shadow-sm border border-gray-200 mt-6 lg:mr-[26%]">
+          <h2 className="text-lg font-bold bg-gray-50 inline-block px-4 py-2 border-l-4 border-orange-500 mb-6 text-gray-800">Product Details of {product.name}</h2>
+          <div className="prose max-w-none text-gray-700 text-sm md:text-base leading-relaxed">
+            <p className="mb-6 font-medium">
+              {product.description || "Unleash the power of premium quality with this brand new item. Designed with meticulous attention to detail and engineered for peak performance, this product stands out as an indispensable addition to your collection. Whether you're upgrading your lifestyle or searching for the perfect gift, our selection guarantees unmatched durability and cutting-edge features."}
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-6 rounded border border-gray-100 mb-6">
+              <ul className="list-disc pl-5 space-y-3 font-medium text-gray-600">
+                <li>High quality guarantee with a robust 6 months warranty.</li>
+                <li>100% Authentic product sourced directly from the original brand partners.</li>
+                <li>Sleek, modern design matching the latest trends in the marketplace.</li>
+                <li>Incredibly easy installation and immediate out-of-the-box utility.</li>
+              </ul>
+              <ul className="list-disc pl-5 space-y-3 font-medium text-gray-600">
+                <li>Available exclusively at the MERN Store with Cash on Delivery across the nation.</li>
+                <li>Made with highly durable environmental-friendly industrial materials.</li>
+                <li>Supports dual usage modes perfect for outdoor and indoor integration.</li>
+                <li>Includes official packaging box and standard usage manual guides.</li>
+              </ul>
+            </div>
+            
+            <div className="mt-8 text-center text-sm text-gray-400 italic">
+              * Please note that actual item colors may vary slightly from the images due to display settings or manufacturer changes.
+            </div>
+          </div>
+        </div>
+
+      </div>
+      
+      {showLocationModal && (
+        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm animate-[authFade_0.3s_ease-out]">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Select Delivery Location</h3>
+            <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2">
+              {['Western, Colombo 1-15, Colombo 01 - Fort', 'Central, Kandy, Kandy Town Center', 'Southern, Galle, Galle Fort Area', 'Northern, Jaffna, Jaffna Town'].map(loc => (
+                <div key={loc} onClick={() => { setDeliveryLocation(loc); setShowLocationModal(false); }} className={`p-3 rounded border cursor-pointer transition-colors ${deliveryLocation === loc ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-orange-300'}`}>
+                   <p className="text-sm font-semibold text-gray-800 leading-tight">{loc}</p>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowLocationModal(false)} className="w-full bg-gray-100 text-gray-700 font-bold py-2.5 rounded shadow-sm text-sm border border-gray-200 hover:bg-gray-200 transition-colors focus:outline-none">CANCEL</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

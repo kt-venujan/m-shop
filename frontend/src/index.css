@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Outfit', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.animate-m-connect {
+  animation: slideRightLogo 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+}
+
+.animate-store-connect {
+  animation: slideLeftLogo 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+}
+
+@keyframes slideRightLogo {
+  0% { transform: translateX(200%) scale(0.5); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes slideLeftLogo {
+  0% { transform: translateX(-200%) scale(0.5); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes authFade {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-auth-fade {
+  animation: authFade 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
