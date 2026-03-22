@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function Account({ user, handleLogout }) {
   const [activeTab, setActiveTab] = useState('account');
   const [orders, setOrders] = useState([]);
@@ -33,7 +36,7 @@ export default function Account({ user, handleLogout }) {
       const fetchOrders = async () => {
         try {
           const token = localStorage.getItem('mern_token');
-          const res = await axios.get('http://localhost:5000/api/orders', {
+          const res = await axios.get(`${API_BASE_URL}/api/orders`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setOrders(res.data);
@@ -52,7 +55,7 @@ export default function Account({ user, handleLogout }) {
       const fetchReviews = async () => {
         try {
           const token = localStorage.getItem('mern_token');
-          const res = await axios.get('http://localhost:5000/api/reviews/my', {
+          const res = await axios.get(`${API_BASE_URL}/api/reviews/my`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setMyReviews(res.data);
@@ -73,7 +76,7 @@ export default function Account({ user, handleLogout }) {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put('http://localhost:5000/api/auth/profile', {
+      const res = await axios.put(`${API_BASE_URL}/api/auth/profile`, {
         firstName, lastName, dob, name: username
       }, getAuthHeaders());
       // Update local storage user state
@@ -90,7 +93,7 @@ export default function Account({ user, handleLogout }) {
     e.preventDefault();
     if (!oldPassword || !newPassword) return;
     try {
-      await axios.put('http://localhost:5000/api/auth/password', {
+      await axios.put(`${API_BASE_URL}/api/auth/password`, {
         oldPassword, newPassword
       }, getAuthHeaders());
       setPasswordMessage('Password updated successfully!');
@@ -110,7 +113,7 @@ export default function Account({ user, handleLogout }) {
     formData.append('image', file);
 
     try {
-      const res = await axios.put('http://localhost:5000/api/auth/profile-picture', formData, {
+      const res = await axios.put(`${API_BASE_URL}/api/auth/profile-picture`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('mern_token')}` 
@@ -126,7 +129,7 @@ export default function Account({ user, handleLogout }) {
 
   const updateOrderAddress = async (orderId, newAddress) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+      const res = await axios.put(`${API_BASE_URL}/api/orders/${orderId}`, {
         shippingAddress: newAddress
       }, getAuthHeaders());
       setOrders(orders.map(o => o._id === orderId ? res.data : o));
@@ -208,7 +211,7 @@ export default function Account({ user, handleLogout }) {
                 
                 {/* Avatar Section */}
                 <div className="flex flex-col items-center flex-shrink-0">
-                  <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden flex items-center justify-center text-3xl font-bold text-gray-300 mb-4 bg-cover bg-center" style={{ backgroundImage: profilePicture ? `url(http://localhost:5000${profilePicture})` : 'none' }}>
+                  <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden flex items-center justify-center text-3xl font-bold text-gray-300 mb-4 bg-cover bg-center" style={{ backgroundImage: profilePicture ? `url(${API_BASE_URL}${profilePicture})` : 'none' }}>
                     {!profilePicture && initials}
                   </div>
                   <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />

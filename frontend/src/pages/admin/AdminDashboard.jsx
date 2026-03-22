@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ products: 0, orders: 0, users: 0, revenue: 0 });
   const [loading, setLoading] = useState(true);
@@ -9,7 +12,7 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await axios.get('http://localhost:5000/api/admin/stats', {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data);

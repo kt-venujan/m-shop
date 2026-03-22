@@ -2,6 +2,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function ProductDetails({ products, addToCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,7 +27,7 @@ export default function ProductDetails({ products, addToCart }) {
     window.scrollTo(0, 0);
     const fetchReviews = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/reviews/product/${id}`);
+        const res = await axios.get(`${API_BASE_URL}/api/reviews/product/${id}`);
         setReviews(res.data);
       } catch (err) {
         console.error("Failed to load reviews");
@@ -38,7 +41,7 @@ export default function ProductDetails({ products, addToCart }) {
     if (!token) return alert('Please login to submit a review.');
     setSubmittingReview(true);
     try {
-      await axios.post('http://localhost:5000/api/reviews', {
+      await axios.post(`${API_BASE_URL}/api/reviews`, {
         product: id,
         rating,
         comment

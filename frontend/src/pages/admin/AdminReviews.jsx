@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +13,7 @@ export default function AdminReviews() {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/reviews/admin', authHeaders);
+      const res = await axios.get(`${API_BASE_URL}/api/reviews/admin`, authHeaders);
       setReviews(res.data);
     } catch (err) {
       console.error('Fetch reviews error', err);
@@ -25,7 +28,7 @@ export default function AdminReviews() {
 
   const handleApproval = async (id, isApproved) => {
     try {
-      await axios.put(`http://localhost:5000/api/reviews/${id}/approve`, { isApproved }, authHeaders);
+      await axios.put(`${API_BASE_URL}/api/reviews/${id}/approve`, { isApproved }, authHeaders);
       setReviews(reviews.map(r => r._id === id ? { ...r, isApproved } : r));
     } catch (err) {
       console.error('Update approval error', err);
@@ -36,7 +39,7 @@ export default function AdminReviews() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you certain you want to permanently delete this user review?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/reviews/${id}`, authHeaders);
+      await axios.delete(`${API_BASE_URL}/api/reviews/${id}`, authHeaders);
       setReviews(reviews.filter(r => r._id !== id));
     } catch (err) {
       console.error('Delete review error', err);

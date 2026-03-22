@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function AdminSettings() {
   const [themeColor, setThemeColor] = useState('#f57224');
   const [sliderImages, setSliderImages] = useState([]);
@@ -14,7 +17,7 @@ export default function AdminSettings() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/settings');
+        const res = await axios.get(`${API_BASE_URL}/api/settings`);
         if (res.data) {
           setThemeColor(res.data.themeColor || '#f57224');
           setSliderImages(res.data.sliderImages || []);
@@ -31,7 +34,7 @@ export default function AdminSettings() {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
-      await axios.put('http://localhost:5000/api/settings', {
+      await axios.put(`${API_BASE_URL}/api/settings`, {
         themeColor,
         sliderImages
       }, authHeaders);
@@ -53,14 +56,14 @@ export default function AdminSettings() {
 
     setUploading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/upload', formData, {
+      const res = await axios.post(`${API_BASE_URL}/api/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
       // Append the new image URL returned from Multer
-      setSliderImages([...sliderImages, `http://localhost:5000${res.data.image}`]);
+      setSliderImages([...sliderImages, `${API_BASE_URL}${res.data.image}`]);
     } catch (err) {
       console.error('Upload failed', err);
       alert('Failed to upload image. Ensure it is a valid format (jpeg/png).');

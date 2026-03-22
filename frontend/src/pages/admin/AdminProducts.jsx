@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +16,7 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/products');
+      const res = await axios.get(`${API_BASE_URL}/api/products`);
       setProducts(res.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -37,10 +40,10 @@ export default function AdminProducts() {
         },
       };
 
-      const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+      const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
       
       // We prepend the backend URL because the backend returns a relative path like `/uploads/file.png`
-      setCurrent({...current, image: `http://localhost:5000${data.image}`});
+      setCurrent({...current, image: `${API_BASE_URL}${data.image}`});
     } catch (err) {
       console.error(err);
       alert('Error uploading image: ' + (err.response?.data?.message || err.message));
@@ -53,9 +56,9 @@ export default function AdminProducts() {
     e.preventDefault();
     try {
       if (current._id) {
-        await axios.put(`http://localhost:5000/api/admin/products/${current._id}`, current, { headers });
+        await axios.put(`${API_BASE_URL}/api/admin/products/${current._id}`, current, { headers });
       } else {
-        await axios.post('http://localhost:5000/api/admin/products', current, { headers });
+        await axios.post(`${API_BASE_URL}/api/admin/products`, current, { headers });
       }
       setModal(false);
       fetchProducts();
@@ -67,7 +70,7 @@ export default function AdminProducts() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/admin/products/${id}`, { headers });
+      await axios.delete(`${API_BASE_URL}/api/admin/products/${id}`, { headers });
       fetchProducts();
     } catch (err) { alert('Error deleting product'); }
   };

@@ -23,6 +23,8 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
 import WhatsAppButton from './components/WhatsAppButton';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 // Component responsible for rendering the full-screen loader between route transitions
 function RouteTransitionLoader() {
   const { pathname } = useLocation();
@@ -93,7 +95,7 @@ function App() {
     if (storedUser && token) {
       setUser(JSON.parse(storedUser));
       // Fetch server cart
-      axios.get('http://localhost:5000/api/cart', {
+      axios.get(`${API_BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => setCart(res.data)).catch(err => console.error('Error fetching cart:', err));
     }
@@ -112,14 +114,14 @@ function App() {
     const localCart = JSON.parse(localStorage.getItem('mern_cart')) || [];
     try {
       if (localCart.length > 0) {
-        await axios.post('http://localhost:5000/api/cart/sync', 
+        await axios.post(`${API_BASE_URL}/api/cart/sync`, 
           { items: localCart.map(i => ({ productId: i._id, quantity: i.quantity })) }, 
           { headers: { Authorization: `Bearer ${token}` } }
         );
         localStorage.removeItem('mern_cart');
       }
       
-      const res = await axios.get('http://localhost:5000/api/cart', {
+      const res = await axios.get(`${API_BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCart(res.data);
@@ -139,7 +141,7 @@ function App() {
     setCart([]);
     if (user) {
       try {
-        await axios.delete('http://localhost:5000/api/cart/clear', getAuthHeaders());
+        await axios.delete(`${API_BASE_URL}/api/cart/clear`, getAuthHeaders());
       } catch (err) { console.error('Clear cart error:', err); }
     } else {
       localStorage.removeItem('mern_cart');
@@ -150,8 +152,8 @@ function App() {
     const fetchData = async () => {
       try {
         const [productsRes, settingsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/products'),
-          axios.get('http://localhost:5000/api/settings')
+          axios.get(`${API_BASE_URL}/api/products`),
+          axios.get(`${API_BASE_URL}/api/settings`)
         ]);
         setSettings(settingsRes.data);
         setTimeout(() => {
@@ -177,7 +179,7 @@ function App() {
     
     if (user) {
       try {
-        await axios.post('http://localhost:5000/api/cart/add', { productId: product._id, quantity }, getAuthHeaders());
+        await axios.post(`${API_BASE_URL}/api/cart/add`, { productId: product._id, quantity }, getAuthHeaders());
       } catch (err) { console.error('Add cart error:', err); }
     }
   };
@@ -188,7 +190,7 @@ function App() {
     
     if (user) {
       try {
-        await axios.put('http://localhost:5000/api/cart/update', { productId, quantity: newQuantity }, getAuthHeaders());
+        await axios.put(`${API_BASE_URL}/api/cart/update`, { productId, quantity: newQuantity }, getAuthHeaders());
       } catch (err) { console.error('Update cart error:', err); }
     }
   };
@@ -198,7 +200,7 @@ function App() {
     
     if (user) {
       try {
-        await axios.delete(`http://localhost:5000/api/cart/remove/${productId}`, getAuthHeaders());
+        await axios.delete(`${API_BASE_URL}/api/cart/remove/${productId}`, getAuthHeaders());
       } catch (err) { console.error('Remove cart error:', err); }
     }
   };

@@ -2,6 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function Checkout({ cart, user, clearCart }) {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState({
@@ -42,7 +45,7 @@ export default function Checkout({ cart, user, clearCart }) {
         shippingAddress: `${customer.name} (${customer.phone}) - ${customer.label}: ${customer.address}`
       };
 
-      await axios.post('http://localhost:5000/api/orders', orderData, {
+      await axios.post(`${API_BASE_URL}/api/orders`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

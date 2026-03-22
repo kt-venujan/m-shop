@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function Auth({ onAuthSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
@@ -41,7 +44,7 @@ export default function Auth({ onAuthSuccess }) {
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };
 
-      const res = await axios.post(`http://localhost:5000${endpoint}`, payload);
+      const res = await axios.post(`${API_BASE_URL}${endpoint}`, payload);
       
       if (res.data.user.isAdmin && isLogin) {
         setIsLoading(false);

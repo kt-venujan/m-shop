@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || `${API_BASE_URL}`;
+
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +13,7 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/admin/orders', { headers });
+      const res = await axios.get(`${API_BASE_URL}/api/admin/orders`, { headers });
       setOrders(res.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -20,7 +23,7 @@ export default function AdminOrders() {
 
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`http://localhost:5000/api/admin/orders/${id}/status`, { status }, { headers });
+      await axios.put(`${API_BASE_URL}/api/admin/orders/${id}/status`, { status }, { headers });
       fetchOrders();
     } catch (err) { alert('Error updating status'); }
   };
