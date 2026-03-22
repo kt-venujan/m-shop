@@ -17,7 +17,13 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:5173", 
+    "https://m-shopme.netlify.app" // 👈 Add your Netlify link here!
+  ],
+  credentials: true
+}));
 
 // Connect to Database
 connectDB();
@@ -39,3 +45,4 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 app.listen(5000, () => {
     console.log("🚀 Server is running on http://localhost:5000");
 });
+
