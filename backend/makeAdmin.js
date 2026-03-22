@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
+require('dotenv').config(); // 👈 This loads the secret notes
 
-const DB_URL = "mongodb+srv://client1:5555@cluster0.oe4h6ch.mongodb.net/?appName=Cluster0";
+const DB_URL = process.env.MONGODB_URI;
 
 async function makeAdmin(email) {
     try {

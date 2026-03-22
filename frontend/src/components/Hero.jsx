@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
-export default function Hero({ selectedCategory, setSelectedCategory }) {
-  const bgImages = [
+export default function Hero({ settings, selectedCategory, setSelectedCategory }) {
+  const bgImages = settings?.sliderImages?.length > 0 ? settings.sliderImages : [
     '/hero-bg.png',
     '/hero-bg-2.png',
     '/hero-bg-3.png'
@@ -38,12 +38,12 @@ export default function Hero({ selectedCategory, setSelectedCategory }) {
 
       {/* Main Content */}
       <div className="relative z-20 w-full max-w-5xl mx-auto px-4 text-center mt-4">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white drop-shadow-xl tracking-tight mb-8">
+        <h1 data-aos="zoom-out" data-aos-duration="1000" className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white drop-shadow-xl tracking-tight mb-8">
           I'm looking for
         </h1>
         
         {/* Search / Filter inline form */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2">
+        <div data-aos="fade-up" data-aos-delay="200" className="flex flex-col md:flex-row items-center justify-center gap-2">
           
           {/* Dropdown 1 */}
           <div className="relative w-full md:w-52 bg-white rounded flex items-center">
@@ -91,7 +91,7 @@ export default function Hero({ selectedCategory, setSelectedCategory }) {
           </div>
 
           {/* Action Button */}
-          <button className="w-full md:w-auto bg-[#ff5100] hover:bg-[#e64a00] text-white font-bold py-3.5 px-6 rounded transition-colors whitespace-nowrap text-sm">
+          <button onClick={() => setSelectedCategory('All')} className="w-full md:w-auto bg-[#ff5100] hover:bg-[#e64a00] text-white font-bold py-3.5 px-6 rounded transition-colors whitespace-nowrap text-sm">
             See All Products
           </button>
           

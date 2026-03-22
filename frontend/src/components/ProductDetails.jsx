@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function ProductDetails({ products, addToCart }) {
   const { id } = useParams();
@@ -10,10 +11,49 @@ export default function ProductDetails({ products, addToCart }) {
   const [deliveryLocation, setDeliveryLocation] = useState('Western, Colombo 1-15, Colombo 01 - Fort');
   const [showLocationModal, setShowLocationModal] = useState(false);
 
-  // Scroll to top automatically when clicking a product
+  // Reviews logic
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewMessage, setReviewMessage] = useState('');
+  const token = localStorage.getItem('mern_token');
+  const user = JSON.parse(localStorage.getItem('mern_user') || 'null');
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/reviews/product/${id}`);
+        setReviews(res.data);
+      } catch (err) {
+        console.error("Failed to load reviews");
+      }
+    };
+    fetchReviews();
   }, [id]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!token) return alert('Please login to submit a review.');
+    setSubmittingReview(true);
+    try {
+      await axios.post('http://localhost:5000/api/reviews', {
+        product: id,
+        rating,
+        comment
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setReviewMessage('Review submitted successfully! It is currently pending admin approval.');
+      setComment('');
+      setRating(5);
+    } catch (err) {
+      setReviewMessage(err.response?.data?.message || 'Failed to submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const averageRating = reviews.length ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1) : 0;
 
   const product = products.find(p => p._id === id);
 
@@ -38,7 +78,7 @@ export default function ProductDetails({ products, addToCart }) {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
+    <div data-aos="fade-up" className="bg-gray-50 min-h-screen pb-20">
       {/* Breadcrumbs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm text-gray-500 font-medium">
         <Link to="/" className="text-blue-600 hover:text-orange-600 hover:underline transition-colors">Home</Link>
@@ -84,8 +124,10 @@ export default function ProductDetails({ products, addToCart }) {
               {/* Ratings & Brand Row */}
               <div className="flex items-center gap-4 text-sm mb-4 pb-4">
                 <div className="flex items-center text-[#f57224] text-lg">
-                  ★★★★<span className="text-gray-300">★</span>
-                  <span className="text-blue-600 hover:text-orange-500 hover:underline ml-3 cursor-pointer text-sm">13 Ratings</span>
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className={i < Math.round(averageRating || 0) ? "text-[#f57224]" : "text-gray-300"}>★</span>
+                  ))}
+                  <span className="text-blue-600 hover:text-orange-500 hover:underline ml-3 cursor-pointer text-sm">{reviews.length > 0 ? `${reviews.length} Ratings` : 'No Ratings Yet'}</span>
                 </div>
                 <div className="text-gray-300">|</div>
                 <div className="text-gray-500 text-sm">
@@ -227,6 +269,81 @@ export default function ProductDetails({ products, addToCart }) {
               * Please note that actual item colors may vary slightly from the images due to display settings or manufacturer changes.
             </div>
           </div>
+        </div>
+
+        {/* REVIEWS SECTION */}
+        <div className="bg-white p-6 md:p-10 rounded-lg shadow-sm border border-gray-200 mt-6 lg:mr-[26%]">
+          <div className="flex items-center gap-4 mb-8 border-b border-gray-100 pb-4">
+            <h2 className="text-2xl font-extrabold text-gray-900">Customer Reviews</h2>
+            <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
+               <span className="text-orange-600 font-black text-sm">{averageRating}</span>
+               <svg className="w-4 h-4 text-orange-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+               <span className="text-gray-500 text-xs font-bold">({reviews.length})</span>
+            </div>
+          </div>
+
+          {/* Submission Form */}
+          <div className="mb-10 bg-gray-50 p-6 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Write a Review</h3>
+            {user ? (
+              <form onSubmit={handleSubmitReview}>
+                {reviewMessage && <div className="mb-4 text-sm font-bold text-orange-600 bg-orange-50 px-4 py-3 rounded border border-orange-100">{reviewMessage}</div>}
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Rating</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <svg key={star} onClick={() => setRating(star)} className={`w-8 h-8 cursor-pointer transition-colors ${rating >= star ? 'text-amber-400 fill-current' : 'text-gray-300 fill-current hover:text-amber-200'}`} viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Comment</label>
+                  <textarea required value={comment} onChange={e => setComment(e.target.value)} rows="4" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200 focus:border-orange-500 transition-colors text-sm text-gray-800" placeholder="What did you like or dislike about this product?"></textarea>
+                </div>
+
+                <button type="submit" disabled={submittingReview} className="bg-black hover:bg-gray-800 text-white font-bold text-sm px-6 py-3 rounded shadow transition-colors w-full md:w-auto">
+                  {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </form>
+            ) : (
+              <div className="text-center py-6 border border-dashed border-gray-300 bg-white rounded">
+                <p className="text-sm font-bold text-gray-500 mb-3">You must be logged in to leave a review.</p>
+                <Link to="/auth" className="text-orange-600 font-bold hover:underline text-sm">Sign In / Register</Link>
+              </div>
+            )}
+          </div>
+
+          {/* Render Approved Reviews */}
+          <div className="space-y-6">
+            {reviews.length === 0 ? (
+              <p className="text-sm text-gray-500 italic">No reviews yet. Be the first to review!</p>
+            ) : (
+              reviews.map(rev => (
+                <div key={rev._id} className="border-b border-gray-100 pb-6 last:border-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center font-bold text-gray-500 uppercase">
+                      {rev.user?.name?.substring(0,2) || 'US'}
+                    </div>
+                    <div>
+                      <span className="font-bold text-gray-900 text-sm block">{rev.user?.name || 'Verified Buyer'}</span>
+                      <div className="flex text-amber-400 mt-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <svg key={i} className={`w-3 h-3 ${i < rev.rating ? 'fill-current' : 'text-gray-200 fill-current'}`} viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="ml-auto text-xs font-semibold text-gray-400">{new Date(rev.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed font-medium mt-3 pl-13 flex"><span className="w-13 inline-block hidden md:block opacity-0">...</span>{rev.comment}</p>
+                </div>
+              ))
+            )}
+          </div>
+
         </div>
 
       </div>

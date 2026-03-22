@@ -8,7 +8,9 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
-const cartRoutes = require('./routes/cartRoutes'); // + Added cart route
+const cartRoutes = require('./routes/cartRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const path = require('path');
 
 const app = express();
@@ -26,7 +28,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
-app.use('/api/cart', cartRoutes); // + Cart Routes API
+app.use('/api/cart', cartRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Serve images statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ProductList from './components/ProductList';
@@ -17,6 +19,8 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminLogin from './pages/admin/AdminLogin';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminReviews from './pages/admin/AdminReviews';
 import WhatsAppButton from './components/WhatsAppButton';
 
 // Component responsible for rendering the full-screen loader between route transitions
@@ -27,7 +31,10 @@ function RouteTransitionLoader() {
   useEffect(() => {
     setIsTransitioning(true);
     window.scrollTo(0, 0); 
-    const timer = setTimeout(() => setIsTransitioning(false), 1200);
+    const timer = setTimeout(() => {
+      setIsTransitioning(false);
+      setTimeout(() => AOS.refresh(), 100);
+    }, 1200);
     return () => clearTimeout(timer);
   }, [pathname]);
 
@@ -40,13 +47,13 @@ function RouteTransitionLoader() {
   );
 }
 
-function MainLayout({ children, cartCount, products, user, searchTerm, setSearchTerm, handleLogout }) {
+function MainLayout({ children, cartCount, products, user, searchTerm, setSearchTerm, handleLogout, setSelectedCategory }) {
   const { pathname } = useLocation();
   const isAdmin = pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans selection:bg-orange-200 flex flex-col">
-      {!isAdmin && <Navbar cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} />}
+      {!isAdmin && <Navbar cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} setSelectedCategory={setSelectedCategory} />}
       
       <main className="flex-grow relative z-0">
         {children}
@@ -61,6 +68,7 @@ function MainLayout({ children, cartCount, products, user, searchTerm, setSearch
 function App() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
+  const [settings, setSettings] = useState(null);
   const [globalLoading, setGlobalLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,6 +83,9 @@ function App() {
     localStorage.setItem('mern_cart', JSON.stringify(cart));
   }, [cart]);
 
+  useEffect(() => {
+    AOS.init({ duration: 800, once: true, offset: 100 });
+  }, []);
   useEffect(() => {
     // Attempt to load user from local storage
     const storedUser = localStorage.getItem('mern_user');
@@ -136,11 +147,15 @@ function App() {
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const [productsRes, settingsRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/products'),
+          axios.get('http://localhost:5000/api/settings')
+        ]);
+        setSettings(settingsRes.data);
         setTimeout(() => {
-          setProducts(response.data);
+          setProducts(productsRes.data);
           setGlobalLoading(false);
         }, 1800);
       } catch (error) {
@@ -148,7 +163,7 @@ function App() {
         setGlobalLoading(false);
       }
     };
-    fetchProducts();
+    fetchData();
   }, []);
 
   const addToCart = async (product, quantity = 1) => {
@@ -208,14 +223,24 @@ function App() {
 
   return (
     <BrowserRouter>
+      {settings && (
+        <style>{`
+          .bg-orange-600, .bg-[#ff5100], .bg-orange-500, .bg-[#f57224] { background-color: ${settings.themeColor} !important; }
+          .text-orange-600, .text-[#ff5100], .text-orange-500, .text-[#f57224] { color: ${settings.themeColor} !important; }
+          .border-orange-600, .border-[#ff5100], .border-orange-500, .border-[#f57224] { border-color: ${settings.themeColor} !important; }
+          .ring-orange-600, .ring-[#ff5100], .ring-orange-500 { --tw-ring-color: ${settings.themeColor} !important; }
+          .shadow-orange-200 { --tw-shadow-color: ${settings.themeColor}55 !important; }
+        `}</style>
+      )}
       {/* Activates the full-page loader on every navigation routing link clicked */}
       <RouteTransitionLoader />
       
-      <MainLayout cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout}>
+      <MainLayout cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} setSelectedCategory={setSelectedCategory}>
         <Routes>
           <Route path="/" element={
             <>
               <Hero 
+                settings={settings}
                 selectedCategory={selectedCategory} 
                 setSelectedCategory={setSelectedCategory} 
               />
@@ -242,6 +267,8 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
       </MainLayout>

@@ -73,7 +73,7 @@ export default function Checkout({ cart, user, clearCart }) {
   }
 
   return (
-    <div className="bg-[#f5f5f5] min-h-screen py-8 pb-32">
+    <div data-aos="fade-up" className="bg-[#f5f5f5] min-h-screen py-8 pb-32">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
         
         {/* Left Column (Width 8) */}

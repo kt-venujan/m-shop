@@ -13,6 +13,8 @@ export default function AdminLayout() {
     { name: 'Products', path: '/admin/products' },
     { name: 'Orders', path: '/admin/orders' },
     { name: 'Customers', path: '/admin/users' },
+    { name: 'Reviews', path: '/admin/reviews' },
+    { name: 'Site Settings', path: '/admin/settings' },
   ];
 
   return (

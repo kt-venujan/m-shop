@@ -1,7 +1,43 @@
 export default function Footer() {
   return (
     <>
-      <div className="bg-[#f8f9fa] border-t border-gray-200 py-4 w-full md:block z-10 relative">
+      {/* About Us Section */}
+      <div data-aos="fade-up" className="bg-white border-t border-gray-200 py-16 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            {/* Image on the left */}
+            <div className="w-full lg:w-1/2 relative">
+              <div className="absolute inset-0 bg-orange-600 rounded-2xl transform rotate-3 scale-105 opacity-10"></div>
+              <img 
+                src="/about-us.png" 
+                alt="Inside Our Premium Store" 
+                className="relative rounded-2xl shadow-xl w-full h-auto object-cover border border-gray-100 transform hover:-translate-y-1 transition-transform duration-500" 
+              />
+            </div>
+            
+            {/* Description on the right */}
+            <div className="w-full lg:w-1/2">
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6 tracking-tight relative inline-block">
+                About Our Shop
+                <span className="absolute -bottom-2 left-0 w-16 h-1.5 bg-orange-500 rounded-full"></span>
+              </h2>
+              <div className="prose prose-orange max-w-none text-gray-600">
+                <p className="font-semibold text-lg md:text-xl text-gray-800 leading-snug mb-4">
+                  Welcome to MERN Shop—your premium destination for curated, high-quality products. We bridge the gap between world-class brands and everyday accessibility.
+                </p>
+                <p className="leading-relaxed mb-6 font-medium">
+                  Our mission is simple: to provide a hyper-secure, seamless, and visually stunning shopping environment. Every single item in our inventory passes rigorous quality assurance checks, ensuring you only receive 100% authentic merchandise. 
+                </p>
+                <p className="leading-relaxed text-sm text-gray-500">
+                  Whether you are upgrading your daily tech, refreshing your wardrobe, or searching for the perfect gift, our dedicated customer service team and rapid nationwide delivery network guarantee unparalleled satisfaction. Thank you for making us your trusted retail partner.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-aos="fade-up" className="bg-[#f8f9fa] border-t border-gray-200 py-4 w-full md:block z-10 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-end items-center gap-4">
           <span className="text-[#0a4275] font-medium text-[16px] tracking-wide">Payment Methods</span>
           
@@ -52,7 +88,7 @@ export default function Footer() {
       </div>
     
     <footer className="bg-black border-t border-gray-900 border-t-4 border-t-orange-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div data-aos="fade-up" data-aos-offset="50" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col md:flex-row justify-between items-start gap-12">
           
           {/* Brand & Description */}

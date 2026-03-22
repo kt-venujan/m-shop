@@ -14,15 +14,14 @@ export default function ProductList({ products, addToCart }) {
         
         {/* Flash Sale Section */}
         <div>
-          <h2 className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight">Flash Sale</h2>
-          <div className="bg-white px-5 py-4 flex flex-col items-start shadow-sm mb-0 border-b border-gray-100">
+          <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight">Flash Sale</h2>
+          <div data-aos="fade-up" className="bg-white px-5 py-4 flex flex-col items-start shadow-sm mb-0 border-b border-gray-100">
             <div className="flex justify-between items-center w-full">
               <span className="text-orange-500 font-medium text-sm">On Sale Now</span>
-              <Link to="/" className="text-orange-500 border border-orange-500 px-4 py-1.5 text-xs font-bold uppercase tracking-wider hover:bg-orange-50 transition-colors">SHOP ALL PRODUCTS</Link>
             </div>
           </div>
           
-          <div className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100 shadow-sm border-b border-gray-100">
+          <div data-aos="fade-up" data-aos-delay="100" className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100 shadow-sm border-b border-gray-100">
             {flashProducts.map(product => (
               <Link to={`/product/${product._id}`} key={product._id} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative block bg-white h-full flex flex-col justify-start">
                 <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">
@@ -47,8 +46,8 @@ export default function ProductList({ products, addToCart }) {
 
         {/* Categories Section */}
         <div>
-          <h2 className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-6">Categories</h2>
-          <div className="bg-white shadow-sm border border-gray-100">
+          <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-6">Categories</h2>
+          <div data-aos="fade-up" data-aos-delay="100" className="bg-white shadow-sm border border-gray-100">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
               {uniqueCategories.map((category, idx) => {
                 // Find a product in this category to use its image for the category thumbnail
@@ -71,8 +70,8 @@ export default function ProductList({ products, addToCart }) {
         </div>
         {/* Just Picked For You Section */}
         <div>
-          <h2 className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-8">Just Picked For You</h2>
-          <div className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 divide-x divide-y divide-gray-100 shadow-sm border border-gray-100">
+          <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-8">Just Picked For You</h2>
+          <div data-aos="fade-up" data-aos-delay="100" className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 divide-x divide-y divide-gray-100 shadow-sm border border-gray-100">
             {products.map(product => (
               <Link to={`/product/${product._id}`} key={product._id} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative block bg-white h-full flex flex-col justify-start">
                 <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">

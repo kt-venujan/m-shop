@@ -6,8 +6,8 @@ export default function Cart({ cart, updateQuantity, removeFromCart }) {
   const total = subtotal + tax;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <h1 className="text-4xl font-extrabold text-black tracking-tight mb-10">Your Cart</h1>
+    <div data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1 data-aos="fade-right" data-aos-delay="100" className="text-4xl font-extrabold text-black tracking-tight mb-10">Your Cart</h1>
       
       {cart.length === 0 ? (
         <div className="text-center py-24 bg-white shadow-sm border border-gray-200 rounded-xl">
