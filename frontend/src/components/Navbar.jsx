@@ -1,20 +1,44 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 export default function Navbar({ cartCount = 0, products = [], user = null, searchTerm = '', setSearchTerm, handleLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
     if (setSearchTerm) setSearchTerm(e.target.value);
+    setShowSuggestions(true);
     // Redirect to home page if they search from another page
     if (e.target.value.trim() !== '' && location.pathname !== '/') {
       navigate('/');
     }
   };
 
+  const handleSuggestionClick = (product) => {
+    if (setSearchTerm) setSearchTerm(product.name);
+    setShowSuggestions(false);
+    navigate(`/product/${product._id}`);
+  };
+
+  const suggestions = searchTerm.trim() 
+    ? products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).slice(0, 6)
+    : [];
+
   return (
     <>
-      <header className="w-full bg-white shadow-sm z-50 sticky top-0">
+      <header className="w-full bg-white shadow-sm z-40 sticky top-0">
         {/* Top Shelf */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
         {/* Logo */}
@@ -32,8 +56,8 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
 
         {/* Search Bar */}
         <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-          <div className="relative w-full group">
-            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+          <div className="relative w-full group" ref={searchRef}>
+            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none z-10">
               <svg className="h-5 w-5 text-orange-600 group-focus-within:animate-pulse transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -42,9 +66,31 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
               type="text"
               value={searchTerm}
               onChange={handleSearch}
-              className="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-full leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-500/30 focus:border-orange-500 focus:bg-white sm:text-sm transition-all duration-300 shadow-sm hover:shadow-md"
+              onFocus={() => setShowSuggestions(true)}
+              className="block flex-1 w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-full leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-orange-500/30 focus:border-orange-500 focus:bg-white sm:text-sm transition-all duration-300 shadow-sm hover:shadow-md relative z-10"
               placeholder="Search electronics, clothing, accessories..."
             />
+            
+            {/* Suggestions Dropdown */}
+            {showSuggestions && searchTerm.trim() !== '' && suggestions.length > 0 && (
+              <div className="absolute top-[100%] left-0 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 py-3 z-50 overflow-hidden transform translate-y-2">
+                {suggestions.map((product, index) => (
+                  <div
+                    key={product._id}
+                    onClick={() => handleSuggestionClick(product)}
+                    className="px-6 py-3 cursor-pointer hover:bg-orange-50 transition-colors group/suggestion flex items-center"
+                  >
+                    <span className={`text-[15px] ${index === 0 ? 'text-orange-500' : 'text-gray-600 group-hover/suggestion:text-orange-500'} transition-colors`}>
+                      {product.name.split(new RegExp(`(${searchTerm})`, 'gi')).map((part, i) => 
+                        part.toLowerCase() === searchTerm.toLowerCase() 
+                          ? <span key={i} className={`font-extrabold ${index === 0 ? 'text-orange-600' : 'text-black group-hover/suggestion:text-orange-600'}`}>{part}</span>
+                          : part
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

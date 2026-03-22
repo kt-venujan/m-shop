@@ -8,7 +8,7 @@ export default function AdminProducts() {
   const [modal, setModal] = useState(false);
   const [current, setCurrent] = useState({ name: '', price: '', category: '', description: '', stock: '', image: '' });
 
-  const token = localStorage.getItem('mern_token');
+  const token = localStorage.getItem('admin_token');
   const headers = { Authorization: `Bearer ${token}` };
 
   const fetchProducts = async () => {

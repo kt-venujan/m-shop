@@ -5,7 +5,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem('mern_token');
+  const token = localStorage.getItem('admin_token');
   const headers = { Authorization: `Bearer ${token}` };
 
   const fetchOrders = async () => {

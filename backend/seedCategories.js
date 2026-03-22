@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Product = require('./models/Product');
 
 // Default local DB fallback if env not set
-const DB_URL = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/mern-shop';
+const DB_URL = "mongodb+srv://client1:5555@cluster0.oe4h6ch.mongodb.net/?appName=Cluster0";
 
 const newProducts = [
   { name: '100pcs Wire Connectors Terminals', price: 12.99, description: 'Electrical Circuitry & Parts', category: 'Electrical Circuitry & Parts', image: 'https://images.unsplash.com/photo-1558222218-b7b54eede3f3?w=500&q=80' },

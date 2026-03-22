@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function AdminLogin({ onAuthSuccess }) {
+export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,14 +25,9 @@ export default function AdminLogin({ onAuthSuccess }) {
         return;
       }
 
-      // If valid admin, save data using the parent handler or local storage directly
-      // Here we assume onAuthSuccess is passed or we just do it manually
-      if (onAuthSuccess) {
-          onAuthSuccess(user, token);
-      } else {
-          localStorage.setItem('mern_token', token);
-          localStorage.setItem('mern_user', JSON.stringify(user));
-      }
+      // Save strictly to independent Admin tokens so it doesn't collide with Customer Sessions.
+      localStorage.setItem('admin_token', token);
+      localStorage.setItem('admin_user', JSON.stringify(user));
       
       // Redirect to the dashboard
       navigate('/admin');

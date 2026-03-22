@@ -43,6 +43,11 @@ export default function Auth({ onAuthSuccess }) {
 
       const res = await axios.post(`http://localhost:5000${endpoint}`, payload);
       
+      if (res.data.user.isAdmin && isLogin) {
+        setIsLoading(false);
+        return setError('Administrators must log in via the /admin/login portal.');
+      }
+      
       onAuthSuccess(res.data.user, res.data.token);
       navigate('/account');
     } catch (err) {

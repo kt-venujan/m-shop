@@ -1,12 +1,31 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 export default function Account({ user, handleLogout }) {
+  const [activeTab, setActiveTab] = useState('account');
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
+  // Profile Form States
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
+  const [dob, setDob] = useState(user?.dob ? new Date(user.dob).toISOString().split('T')[0] : '');
+  const [username, setUsername] = useState(user?.name || '');
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '');
+
+  // Password Reset States
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+
+  // General Status
+  const [message, setMessage] = useState('');
+  
+  // File Upload Ref
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
-    if (user) {
+    if (user && activeTab === 'orders') {
       const fetchOrders = async () => {
         try {
           const token = localStorage.getItem('mern_token');
@@ -22,7 +41,77 @@ export default function Account({ user, handleLogout }) {
       };
       fetchOrders();
     }
-  }, [user]);
+  }, [user, activeTab]);
+
+  const getAuthHeaders = () => {
+    return { headers: { Authorization: `Bearer ${localStorage.getItem('mern_token')}` } };
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put('http://localhost:5000/api/auth/profile', {
+        firstName, lastName, dob, name: username
+      }, getAuthHeaders());
+      // Update local storage user state
+      localStorage.setItem('mern_user', JSON.stringify(res.data.user));
+      setMessage('Profile updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+      window.location.reload(); // Quick refresh to update top navbar states
+    } catch (err) {
+      setMessage('Failed to update profile.');
+    }
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (!oldPassword || !newPassword) return;
+    try {
+      await axios.put('http://localhost:5000/api/auth/password', {
+        oldPassword, newPassword
+      }, getAuthHeaders());
+      setPasswordMessage('Password updated successfully!');
+      setOldPassword('');
+      setNewPassword('');
+      setTimeout(() => setPasswordMessage(''), 3000);
+    } catch (err) {
+      setPasswordMessage('Failed to update password. Check old password.');
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await axios.put('http://localhost:5000/api/auth/profile-picture', formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('mern_token')}` 
+        }
+      });
+      setProfilePicture(res.data.user.profilePicture);
+      localStorage.setItem('mern_user', JSON.stringify(res.data.user));
+      window.location.reload();
+    } catch (err) {
+      console.error("Error uploading image");
+    }
+  };
+
+  const updateOrderAddress = async (orderId, newAddress) => {
+    try {
+      const res = await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+        shippingAddress: newAddress
+      }, getAuthHeaders());
+      setOrders(orders.map(o => o._id === orderId ? res.data : o));
+      alert("Address updated successfully!");
+    } catch (err) {
+      alert("Failed to update address. Ensure the order is still Processing.");
+    }
+  };
 
   if (!user) {
     return (
@@ -36,89 +125,220 @@ export default function Account({ user, handleLogout }) {
   const initials = user.name ? user.name.substring(0, 2).toUpperCase() : 'US';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-12 border-b border-gray-200 pb-10">
-        <div className="w-24 h-24 bg-orange-100 flex items-center justify-center rounded-full text-orange-600 text-4xl font-black shadow-inner">
-          {initials}
+    <div className="max-w-6xl mx-auto my-10 bg-white shadow-xl rounded-2xl overflow-hidden flex min-h-[800px] border border-gray-100 relative">
+      
+      {/* Sidebar Panel */}
+      <div className="w-[280px] bg-white flex-shrink-0 border-r border-[#eaedf3] p-6 flex flex-col">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Settings</h2>
+        
+        <div className="relative mb-8 pt-1">
+          <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input type="text" placeholder="Search Settings" className="w-full bg-white border border-gray-200 shadow-sm rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all text-gray-700 placeholder-gray-400" />
         </div>
-        <div className="text-center md:text-left mt-2">
-          <h1 className="text-4xl font-extrabold text-black tracking-tight">{user.name}</h1>
-          <p className="text-gray-500 font-medium mt-1 text-lg">{user.email}</p>
+
+        <nav className="flex-1 space-y-1">
+          <button onClick={() => setActiveTab('account')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === 'account' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            Account
+          </button>
+          
+          <button onClick={() => setActiveTab('orders')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === 'orders' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            My Orders
+          </button>
+
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-all">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
+            My Reviews
+          </button>
+
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500 hover:bg-orange-50 hover:text-orange-600 transition-all">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            My Returns & Cancellations
+          </button>
+        </nav>
+
+        <div className="mt-auto pb-4">
+          <button onClick={() => { handleLogout(); window.location.href = '/'; }} className="w-max flex items-center gap-2 px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold shadow-sm shadow-orange-200 transition-colors">
+            <svg className="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            Logout
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Sidebar Nav */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden sticky top-8">
-            <nav className="flex flex-col">
-              <a href="#" className="px-6 py-5 bg-gray-50 border-l-4 border-orange-600 text-black font-extrabold text-sm uppercase tracking-wider">Account Overview</a>
-              <a href="#" className="px-6 py-5 border-t border-gray-100 text-gray-600 hover:bg-gray-50 hover:text-orange-600 font-bold text-sm uppercase tracking-wider transition-colors">Order History</a>
-              <a href="#" className="px-6 py-5 border-t border-gray-100 text-gray-600 hover:bg-gray-50 hover:text-orange-600 font-bold text-sm uppercase tracking-wider transition-colors">Payment Methods</a>
-              <a href="#" className="px-6 py-5 border-t border-gray-100 text-gray-600 hover:bg-gray-50 hover:text-orange-600 font-bold text-sm uppercase tracking-wider transition-colors">Addresses</a>
-              <button onClick={handleLogout} className="text-left px-6 py-5 border-t border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600 font-bold text-sm uppercase tracking-wider transition-colors mt-4">Sign Out</button>
-            </nav>
-          </div>
-        </div>
+      {/* Main Content Pane */}
+      <div className="flex-1 bg-white overflow-y-auto">
+        
+        {/* Account Settings View */}
+        {activeTab === 'account' && (
+          <div className="max-w-3xl mx-auto py-12 px-10">
+            {message && <div className="mb-6 bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm font-medium border border-green-200">{message}</div>}
+            
+            {/* Basic Information Section */}
+            <form onSubmit={handleProfileUpdate}>
+              <div className="flex items-center gap-3 mb-8">
+                <h3 className="text-[22px] font-bold text-gray-900">Basic Information</h3>
+                <svg className="w-4 h-4 text-gray-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+              </div>
 
-        {/* Main Content Area */}
-        <div className="md:col-span-3 space-y-10">
-          <div className="bg-white p-8 md:p-10 rounded-xl border border-gray-200 shadow-sm">
-            <h2 className="text-2xl font-extrabold text-black mb-6">Recent Orders</h2>
+              <div className="flex flex-col md:flex-row gap-12 border-b border-gray-100 pb-12 mb-10">
+                
+                {/* Avatar Section */}
+                <div className="flex flex-col items-center flex-shrink-0">
+                  <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden flex items-center justify-center text-3xl font-bold text-gray-300 mb-4 bg-cover bg-center" style={{ backgroundImage: profilePicture ? `url(http://localhost:5000${profilePicture})` : 'none' }}>
+                    {!profilePicture && initials}
+                  </div>
+                  <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
+                  <button type="button" onClick={() => fileInputRef.current.click()} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors mb-1">Upload new picture</button>
+                  <button type="button" className="text-sm font-semibold text-[#ff6b6b] hover:text-red-600 transition-colors">Remove</button>
+                </div>
+
+                {/* Form Fields Section */}
+                <div className="flex-1 space-y-5">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">First name</label>
+                      <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all font-medium" />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last name</label>
+                      <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all font-medium" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Date of birth</label>
+                    <div className="relative">
+                      <input type="date" value={dob} onChange={e => setDob(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all font-medium appearance-none" />
+                      <svg className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
+                    <input type="email" value={user.email} disabled className="w-full border border-gray-200 bg-[#e3e7ee] rounded-md px-3 py-2.5 text-sm text-gray-500 font-medium cursor-not-allowed" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Account Information Section */}
+              <div className="flex items-center gap-3 mb-6">
+                <h3 className="text-[22px] font-bold text-gray-900">Account Information</h3>
+                <svg className="w-4 h-4 text-gray-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+              </div>
+
+              <div className="space-y-5 md:w-2/3 ml-auto md:ml-36 pl-0 md:pl-2">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
+                  <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all font-medium" />
+                </div>
+                
+                <div className="pt-4">
+                  <button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors w-full sm:w-auto">Save Basic & Account Changes</button>
+                </div>
+              </div>
+            </form>
+
+            <div className="border-t border-gray-100 my-8"></div>
+            
+            {/* Password Change Sub-section */}
+            <form onSubmit={handlePasswordUpdate}>
+              <div className="space-y-5 md:w-2/3 ml-auto md:ml-36 pl-0 md:pl-2">
+                <h4 className="text-sm font-bold text-gray-900 mb-2">Change Password</h4>
+                {passwordMessage && <div className="text-xs font-semibold text-orange-600 mb-2">{passwordMessage}</div>}
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Current Password</label>
+                  <input type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all" placeholder="•••••••••" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">New Password</label>
+                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all" placeholder="•••••••••" />
+                </div>
+                
+                <div className="pt-2">
+                  <button type="submit" className="border-2 border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 px-6 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto">Update Password</button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        )}
+
+        {/* Orders View */}
+        {activeTab === 'orders' && (
+          <div className="max-w-4xl mx-auto py-12 px-10">
+            <h2 className="text-[24px] font-bold text-gray-900 mb-8">My Orders</h2>
             
             {loadingOrders ? (
-              <div className="py-12 text-center text-gray-400 font-bold animate-pulse">Loading secure order history...</div>
+              <div className="py-20 text-center text-gray-400 font-bold animate-pulse">Loading order history...</div>
             ) : orders.length === 0 ? (
-              <div className="border border-gray-100 rounded-lg flex flex-col items-center justify-center py-16 bg-gray-50 text-center">
-                <span className="text-5xl mb-4 drop-shadow-sm">📦</span>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">No orders yet</h3>
-                <p className="text-gray-500 max-w-sm mb-6 font-medium">When you place an order, it will appear here so you can easily track its status.</p>
-                <a href="/" className="bg-black hover:bg-gray-900 text-white px-8 py-3 rounded shadow-lg font-bold transition-colors border border-transparent hover:border-orange-500">Start Browsing</a>
+              <div className="border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center py-24 bg-gray-50 text-center">
+                <div className="text-6xl mb-4">🛍️</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">No active orders</h3>
+                <p className="text-gray-500 text-sm mb-6 max-w-sm">Any purchases you make will automatically appear here so you can easily track them.</p>
+                <a href="/" className="bg-orange-600 text-white px-6 py-2.5 rounded-lg shadow-sm font-bold text-sm tracking-wide hover:bg-orange-700 transition-colors">Start Shopping</a>
               </div>
             ) : (
               <div className="space-y-6">
                 {orders.map(order => (
-                  <div key={order._id} className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b border-gray-100 pb-4 gap-2">
-                      <div>
-                        <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Order #{order._id.substring(order._id.length - 8).toUpperCase()}</p>
-                        <p className="text-sm text-gray-800 font-medium">{new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
-                      </div>
-                      <div className="text-left sm:text-right">
-                        <p className="text-lg font-extrabold text-[#f57224]">Rs. {order.totalAmount.toLocaleString('en-IN')}</p>
-                        <p className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block mt-1 uppercase">{order.status}</p>
-                      </div>
+                  <div key={order._id} className="border border-gray-200 rounded-xl p-6 bg-white overflow-hidden relative group shadow-sm hover:shadow-md transition-all">
+                    {/* Status Badge */}
+                    <div className="absolute top-6 right-6 flex items-center gap-2">
+                       <span className={`h-2.5 w-2.5 rounded-full ${order.status === 'Processing' ? 'bg-orange-400 animate-pulse' : order.status === 'Shipped' ? 'bg-blue-500' : order.status === 'Delivered' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                       <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{order.status}</span>
                     </div>
+
+                    <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Order ID</p>
+                    <p className="text-lg font-extrabold text-[#212121] mb-6">#{order._id.substring(order._id.length - 10).toUpperCase()}</p>
                     
-                    <div className="space-y-3">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between text-sm text-gray-600 items-center">
-                          <span className="truncate border-r pr-3 mr-3 border-gray-200 font-medium flex-1">{item.name}</span>
-                          <span className="whitespace-nowrap font-bold text-gray-900">Qty: {item.quantity}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Items Purchased</p>
+                        <div className="space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                          {order.items.map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-sm items-center">
+                              <span className="font-semibold text-gray-800 line-clamp-1 flex-1 pr-4">{item.name}</span>
+                              <span className="text-gray-500 font-bold bg-white px-2 py-0.5 rounded border border-gray-200">x{item.quantity}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                        <div className="mt-4 flex justify-between items-end border-t border-gray-100 pt-4">
+                           <span className="text-sm font-bold text-gray-500 tracking-wide uppercase">Order Total</span>
+                           <span className="text-xl font-extrabold text-[#f57224]">Rs. {order.totalAmount.toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col">
+                        <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Shipping Destination</p>
+                        <div className="bg-orange-50/30 p-4 rounded-lg flex-1 border border-orange-100 relative">
+                          <p className="text-[13px] text-gray-700 leading-relaxed font-medium pr-10">{order.shippingAddress}</p>
+                          
+                          {/* Restricting Edit Functionality to Processing Orders Only */}
+                          {order.status === 'Processing' && (
+                            <button 
+                              onClick={() => {
+                                const newAddr = prompt("Update Shipping Address:", order.shippingAddress);
+                                if (newAddr && newAddr !== order.shippingAddress) {
+                                  updateOrderAddress(order._id, newAddr);
+                                }
+                              }}
+                              className="absolute top-4 right-4 text-orange-600 hover:text-orange-800 p-1.5 rounded-full hover:bg-white transition-colors border border-transparent shadow-sm hover:border-orange-200 hover:shadow-md"
+                              title="Edit Address"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
+        )}
 
-          <div className="bg-white p-8 md:p-10 rounded-xl border border-gray-200 shadow-sm">
-            <h2 className="text-2xl font-extrabold text-black mb-6">Personal Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Full Name</label>
-                <input type="text" disabled value={user.name} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 font-medium focus:outline-none" />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Email Address</label>
-                <input type="email" disabled value={user.email} className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-700 font-medium focus:outline-none" />
-              </div>
-            </div>
-            <button className="mt-8 border-2 border-gray-900 text-black font-bold px-8 py-3 rounded-lg hover:border-orange-600 hover:text-orange-600 transition-colors">Edit Details</button>
-          </div>
-        </div>
       </div>
     </div>
   );

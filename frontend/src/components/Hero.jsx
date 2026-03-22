@@ -17,6 +17,7 @@ export default function Hero({ selectedCategory, setSelectedCategory }) {
   }, [bgImages.length]);
 
   return (
+    <div className="flex flex-col w-full">
     <div className="relative bg-black overflow-hidden w-full h-[600px] flex flex-col justify-center items-center">
       {/* Background Image Slider */}
       <div className="absolute inset-0 bg-black">
@@ -109,6 +110,23 @@ export default function Hero({ selectedCategory, setSelectedCategory }) {
           ))}
         </div>
       </div>
+    </div>
+
+    {/* Vibrant Announcement Banner */}
+    <div className="bg-gradient-to-r from-orange-600 via-red-500 to-orange-600 py-3.5 overflow-hidden flex w-full shadow-lg border-y border-orange-400/30">
+      <div className="whitespace-nowrap animate-marquee flex items-center min-w-max hover:animation-play-state-paused cursor-default">
+        {/* 1st Set */}
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">⚡</span> FLASH SALE OFFERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🎉</span> 50% DISCOUNT FOR NEW USERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏷️</span> BUY 1 GET 1 FREE OFFERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🛡️</span> 100% MONEY BACK GUARANTEE</span>
+        {/* 2nd Set for seamless loop */}
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">⚡</span> FLASH SALE OFFERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🎉</span> 50% DISCOUNT FOR NEW USERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🏷️</span> BUY 1 GET 1 FREE OFFERS</span>
+        <span className="text-sm font-black text-white mx-12 tracking-widest uppercase flex items-center gap-2"><span className="text-yellow-300 text-xl drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]">🛡️</span> 100% MONEY BACK GUARANTEE</span>
+      </div>
+    </div>
     </div>
   );
 }

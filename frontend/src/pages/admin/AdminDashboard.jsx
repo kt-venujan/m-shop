@@ -8,7 +8,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('mern_token');
+        const token = localStorage.getItem('admin_token');
         const res = await axios.get('http://localhost:5000/api/admin/stats', {
           headers: { Authorization: `Bearer ${token}` }
         });

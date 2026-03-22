@@ -40,6 +40,24 @@ function RouteTransitionLoader() {
   );
 }
 
+function MainLayout({ children, cartCount, products, user, searchTerm, setSearchTerm, handleLogout }) {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans selection:bg-orange-200 flex flex-col">
+      {!isAdmin && <Navbar cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} />}
+      
+      <main className="flex-grow relative z-0">
+        {children}
+      </main>
+      
+      {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppButton />}
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
@@ -193,47 +211,40 @@ function App() {
       {/* Activates the full-page loader on every navigation routing link clicked */}
       <RouteTransitionLoader />
       
-      <div className="min-h-screen bg-gray-50 font-sans selection:bg-orange-200 flex flex-col">
-        <Navbar cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} />
-        
-        <main className="flex-grow relative z-0">
-          <Routes>
-            <Route path="/" element={
-              <>
-                <Hero 
-                  selectedCategory={selectedCategory} 
-                  setSelectedCategory={setSelectedCategory} 
-                />
-                <ProductList 
-                  products={displayedProducts} 
-                  addToCart={addToCart}
-                />
-              </>
-            } />
-            <Route path="/cart" element={
-              <Cart cart={cart} updateQuantity={updateCartQuantity} removeFromCart={removeFromCart} />
-            } />
-            <Route path="/product/:id" element={
-              <ProductDetails products={products} addToCart={addToCart} />
-            } />
-            <Route path="/checkout" element={
-              <Checkout cart={cart} user={user} clearCart={clearCart} />
-            } />
-            <Route path="/account" element={<Account user={user} handleLogout={handleLogout} />} />
-            <Route path="/auth" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
-            <Route path="/admin/login" element={<AdminLogin onAuthSuccess={handleAuthSuccess} />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="products" element={<AdminProducts />} />
-              <Route path="orders" element={<AdminOrders />} />
-              <Route path="users" element={<AdminUsers />} />
-            </Route>
-          </Routes>
-        </main>
-        
-        <Footer />
-        <WhatsAppButton />
-      </div>
+      <MainLayout cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout}>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <Hero 
+                selectedCategory={selectedCategory} 
+                setSelectedCategory={setSelectedCategory} 
+              />
+              <ProductList 
+                products={displayedProducts} 
+                addToCart={addToCart}
+              />
+            </>
+          } />
+          <Route path="/cart" element={
+            <Cart cart={cart} updateQuantity={updateCartQuantity} removeFromCart={removeFromCart} />
+          } />
+          <Route path="/product/:id" element={
+            <ProductDetails products={products} addToCart={addToCart} />
+          } />
+          <Route path="/checkout" element={
+            <Checkout cart={cart} user={user} clearCart={clearCart} />
+          } />
+          <Route path="/account" element={<Account user={user} handleLogout={handleLogout} />} />
+          <Route path="/auth" element={<Auth onAuthSuccess={handleAuthSuccess} />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="users" element={<AdminUsers />} />
+          </Route>
+        </Routes>
+      </MainLayout>
     </BrowserRouter>
   );
 }

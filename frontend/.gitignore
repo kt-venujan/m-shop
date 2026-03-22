@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# --- MERN SPECIFIC ---
+# Database & Secret Keys (DO NOT REMOVE)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Sub-folder node_modules (Important for your structure!)
+client/node_modules/
+admin/node_modules/
+
+# OS/System files
+Thumbs.db
+desktop.ini
+
+# Build folders
+client/dist/
+admin/dist/

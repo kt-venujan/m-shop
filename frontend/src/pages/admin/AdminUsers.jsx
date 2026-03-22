@@ -8,7 +8,7 @@ export default function AdminUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('mern_token');
+        const token = localStorage.getItem('admin_token');
         const res = await axios.get('http://localhost:5000/api/admin/users', {
           headers: { Authorization: `Bearer ${token}` }
         });
