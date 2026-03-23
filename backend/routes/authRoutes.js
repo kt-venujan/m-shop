@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { register, login, updateProfile, updateProfilePicture, changePassword } = require('../controllers/authController');
+const { register, login, updateProfile, updateProfilePicture, changePassword, requestOtp, deleteAccount } = require('../controllers/authController');
 const { verifyToken } = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
@@ -16,11 +16,11 @@ const storage = multer.diskStorage({
 });
 
 const checkFileType = (file, cb) => {
-  const filetypes = /jpg|jpeg|png|webp|avif/;
+  const filetypes = /jpg|jpeg|png|webp|avif|glb|gltf/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
   if (extname && mimetype) return cb(null, true);
-  cb('Images only!');
+  cb('Images and 3D models only!');
 };
 
 const upload = multer({
@@ -33,5 +33,7 @@ router.post('/login', login);
 router.put('/profile', verifyToken, updateProfile);
 router.put('/profile-picture', verifyToken, upload.single('image'), updateProfilePicture);
 router.put('/password', verifyToken, changePassword);
+router.post('/request-otp', verifyToken, requestOtp);
+router.delete('/delete-account', verifyToken, deleteAccount);
 
 module.exports = router;

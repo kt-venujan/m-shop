@@ -26,14 +26,14 @@ const storage = multer.diskStorage({
 
 // Checking File Type
 function checkFileType(file, cb) {
-  const filetypes = /jpg|jpeg|png|webp|avif/;
+  const filetypes = /jpg|jpeg|png|webp|avif|glb|gltf/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Images only!');
+    cb('Images and 3D models only!');
   }
 }
 

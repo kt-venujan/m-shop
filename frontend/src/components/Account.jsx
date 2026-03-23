@@ -25,6 +25,13 @@ export default function Account({ user, handleLogout }) {
   const [newPassword, setNewPassword] = useState('');
   const [passwordMessage, setPasswordMessage] = useState('');
 
+  // OTP States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpAction, setOtpAction] = useState('');
+  const [otpMessage, setOtpMessage] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+
   // General Status
   const [message, setMessage] = useState('');
   
@@ -91,17 +98,68 @@ export default function Account({ user, handleLogout }) {
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
-    if (!oldPassword || !newPassword) return;
+    if (!oldPassword || !newPassword) {
+      setPasswordMessage('Old and new password are required.');
+      return;
+    }
+    
     try {
-      await axios.put(`${API_BASE_URL}/api/auth/password`, {
-        oldPassword, newPassword
-      }, getAuthHeaders());
-      setPasswordMessage('Password updated successfully!');
-      setOldPassword('');
-      setNewPassword('');
-      setTimeout(() => setPasswordMessage(''), 3000);
+      setPasswordMessage('Requesting OTP...');
+      await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {}, getAuthHeaders());
+      setOtpAction('password');
+      setOtpCode('');
+      setOtpMessage('A 6-digit OTP has been sent to your email to authorize this password change.');
+      setShowOtpModal(true);
+      setPasswordMessage('');
     } catch (err) {
-      setPasswordMessage('Failed to update password. Check old password.');
+      setPasswordMessage(err.response?.data?.message || 'Failed to request OTP');
+    }
+  };
+
+  const handleAccountDeleteRequest = async () => {
+    if (!window.confirm("Are you absolutely sure you want to permanently delete your account? This action cannot be reversed.")) return;
+    
+    try {
+      await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {}, getAuthHeaders());
+      setOtpAction('delete');
+      setOtpCode('');
+      setOtpMessage('A 6-digit OTP has been sent to your email to confirm account deletion.');
+      setShowOtpModal(true);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to request OTP');
+    }
+  };
+
+  const submitOtp = async (e) => {
+    e.preventDefault();
+    if (!otpCode) return setOtpMessage('Please enter the OTP');
+    
+    setOtpLoading(true);
+    try {
+      if (otpAction === 'password') {
+        await axios.put(`${API_BASE_URL}/api/auth/password`, {
+          oldPassword, newPassword, otpCode
+        }, getAuthHeaders());
+        
+        setShowOtpModal(false);
+        setOldPassword('');
+        setNewPassword('');
+        setPasswordMessage('Password updated successfully!');
+        setTimeout(() => setPasswordMessage(''), 3000);
+      } else if (otpAction === 'delete') {
+        await axios.delete(`${API_BASE_URL}/api/auth/delete-account`, {
+          headers: getAuthHeaders().headers,
+          data: { otpCode } // axios delete payload uses 'data' key
+        });
+        
+        setShowOtpModal(false);
+        handleLogout();
+        window.location.href = '/';
+      }
+    } catch (err) {
+      setOtpMessage(err.response?.data?.message || 'Invalid or expired OTP');
+    } finally {
+      setOtpLoading(false);
     }
   };
 
@@ -283,10 +341,18 @@ export default function Account({ user, handleLogout }) {
                 </div>
                 
                 <div className="pt-2">
-                  <button type="submit" className="border-2 border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 px-6 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto">Update Password</button>
+                  <button type="submit" className="border-2 border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 px-6 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto">Request Password Change</button>
                 </div>
               </div>
             </form>
+            
+            {/* Delete Account Sub-section */}
+            <div className="border-t border-gray-100 my-8"></div>
+            <div className="space-y-3 md:w-2/3 ml-auto md:ml-36 pl-0 md:pl-2">
+              <h4 className="text-sm font-bold text-red-600 mb-1">Danger Zone</h4>
+              <p className="text-xs text-gray-500 mb-3">Permanently delete your account and all associated data. This action cannot be undone.</p>
+              <button type="button" onClick={handleAccountDeleteRequest} className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-6 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto">Delete Account</button>
+            </div>
 
           </div>
         )}
@@ -420,6 +486,37 @@ export default function Account({ user, handleLogout }) {
         )}
 
       </div>
+      
+      {/* OTP Verification Modal */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-[authFade_0.3s_ease-out]">
+            <h3 className="text-lg font-extrabold text-gray-900 mb-2">Security Verification</h3>
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{otpMessage}</p>
+            
+            <form onSubmit={submitOtp}>
+              <div className="mb-5">
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Enter 6-digit OTP" 
+                  value={otpCode}
+                  onChange={e => setOtpCode(e.target.value)}
+                  className="w-full text-center text-2xl tracking-[0.5em] font-black border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  maxLength="6"
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button type="button" onClick={() => setShowOtpModal(false)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                <button type="submit" disabled={otpLoading} className={`px-5 py-2 text-sm font-bold text-white rounded-lg transition-colors ${otpAction === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-orange-600 hover:bg-orange-700'}`}>
+                  {otpLoading ? 'Verifying...' : 'Verify & Proceed'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }

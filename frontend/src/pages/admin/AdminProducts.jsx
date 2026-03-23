@@ -8,8 +8,9 @@ export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadingModel, setUploadingModel] = useState(false);
   const [modal, setModal] = useState(false);
-  const [current, setCurrent] = useState({ name: '', price: '', category: '', description: '', stock: '', image: '' });
+  const [current, setCurrent] = useState({ name: '', price: '', category: '', description: '', stock: '', image: '', modelUrl: '' });
 
   const token = localStorage.getItem('admin_token');
   const headers = { Authorization: `Bearer ${token}` };
@@ -52,6 +53,25 @@ export default function AdminProducts() {
     }
   };
 
+  const uploadModelHandler = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('image', file); // uploadRoutes.js uses 'image' field for all general uploads
+    setUploadingModel(true);
+
+    try {
+      const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } };
+      const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
+      setCurrent({...current, modelUrl: `${API_BASE_URL}${data.image}`});
+    } catch (err) {
+      alert('Error uploading model: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setUploadingModel(false);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     try {
@@ -75,7 +95,7 @@ export default function AdminProducts() {
     } catch (err) { alert('Error deleting product'); }
   };
 
-  const openModal = (p = { name: '', price: '', category: '', description: '', stock: '', image: '' }) => {
+  const openModal = (p = { name: '', price: '', category: '', description: '', stock: '', image: '', modelUrl: '' }) => {
     setCurrent(p);
     setModal(true);
   };
@@ -136,6 +156,14 @@ export default function AdminProducts() {
                 <label className="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 text-sm font-bold py-2.5 px-3 rounded-lg cursor-pointer whitespace-nowrap transition-colors">
                   {uploading ? 'Uploading...' : 'Choose File'}
                   <input type="file" className="hidden" onChange={uploadFileHandler} disabled={uploading} accept="image/*" />
+                </label>
+              </div>
+
+              <div className="flex gap-2 items-center">
+                <input placeholder="3D Model GLB URL (or select file)" value={current.modelUrl || ''} onChange={e => setCurrent({...current, modelUrl: e.target.value})} className="flex-1 border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+                <label className="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 text-sm font-bold py-2.5 px-3 rounded-lg cursor-pointer whitespace-nowrap transition-colors">
+                  {uploadingModel ? 'Uploading...' : 'Choose GLB'}
+                  <input type="file" className="hidden" onChange={uploadModelHandler} disabled={uploadingModel} accept=".glb,.gltf" />
                 </label>
               </div>
 

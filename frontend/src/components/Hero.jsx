@@ -98,7 +98,7 @@ export default function Hero({ settings, selectedCategory, setSelectedCategory }
         </div>
         
         {/* Slider Indicators */}
-        <div className="flex justify-center gap-2 mt-8">
+        <div className="hidden md:flex justify-center gap-2 mt-8">
           {bgImages.map((_, idx) => (
             <button
               key={idx}

@@ -6,7 +6,8 @@ const productSchema = new mongoose.Schema({
   description: String,
   category: { type: String, default: 'Uncategorized' },
   stock: Number,
-  image: String
+  image: String,
+  modelUrl: String
 });
 
 // We "export" it so other files can "import" it

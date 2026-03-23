@@ -9,6 +9,7 @@ export default function ProductDetails({ products, addToCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
+  const [viewMode, setViewMode] = useState('2D');
   const [activeImage, setActiveImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState('A');
   const [deliveryLocation, setDeliveryLocation] = useState('Western, Colombo 1-15, Colombo 01 - Fort');
@@ -97,22 +98,49 @@ export default function ProductDetails({ products, addToCart }) {
           {/* Top 3-Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
             
-            {/* Column 1: Images (Left - width 4) */}
             <div className="lg:col-span-4 flex flex-col items-center select-none">
-              <div className="w-full aspect-square bg-[#f2f2f2] border border-gray-100 rounded-sm overflow-hidden flex items-center justify-center mb-4 relative cursor-zoom-in group">
-                {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+              <div className="w-full aspect-square bg-[#f2f2f2] border border-gray-100 rounded-sm overflow-hidden flex items-center justify-center mb-4 relative group">
+                {viewMode === '3D' ? (
+                  <model-viewer
+                    src={product.modelUrl || 'https://modelviewer.dev/shared-assets/models/Shoe.glb'}
+                    alt={product.name}
+                    auto-rotate
+                    camera-controls
+                    shadow-intensity="1"
+                    style={{ width: '100%', height: '100%', backgroundColor: '#f2f2f2', outline: 'none' }}
+                  ></model-viewer>
                 ) : (
-                  <span className="text-9xl drop-shadow-lg transform group-hover:scale-110 transition-transform duration-500">
-                    {product.category === 'Electronics' ? '💻' : 
-                     product.category === 'Clothing' ? '👕' : 
-                     product.category === 'Sports' ? '⚽' :
-                     product.category === 'Beauty' ? '💄' : '🛍️'}
-                  </span>
+                  product.image ? (
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" />
+                  ) : (
+                    <span className="text-9xl drop-shadow-lg transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500">
+                      {product.category === 'Electronics' ? '💻' : 
+                       product.category === 'Clothing' ? '👕' : 
+                       product.category === 'Sports' ? '⚽' :
+                       product.category === 'Beauty' ? '💄' : '🛍️'}
+                    </span>
+                  )
                 )}
                 
+                {/* View Mode Toggle Pill */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md rounded-full shadow-lg p-1 flex gap-1 z-10 border border-gray-200">
+                  <button 
+                    onClick={() => setViewMode('2D')} 
+                    className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide transition-all ${viewMode === '2D' ? 'bg-black text-white shadow' : 'text-gray-600 hover:text-black hover:bg-white'} focus:outline-none`}
+                  >
+                    2D Image
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('3D')} 
+                    className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide transition-all flex items-center gap-1.5 ${viewMode === '3D' ? 'bg-orange-600 text-white shadow' : 'text-gray-600 hover:text-orange-600 hover:bg-white'} focus:outline-none`}
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                    Interactive 3D
+                  </button>
+                </div>
+                
                 {/* Discount Badge overlay */}
-                <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded pointer-events-none z-20">
                   -50%
                 </div>
               </div>

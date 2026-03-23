@@ -76,6 +76,20 @@ export default function AdminSettings() {
     setSliderImages(sliderImages.filter((_, idx) => idx !== indexToRemove));
   };
 
+  const moveImageUp = (index) => {
+    if (index === 0) return;
+    const newImages = [...sliderImages];
+    [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+    setSliderImages(newImages);
+  };
+
+  const moveImageDown = (index) => {
+    if (index === sliderImages.length - 1) return;
+    const newImages = [...sliderImages];
+    [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+    setSliderImages(newImages);
+  };
+
   if (loading) return <div className="p-8 font-bold text-gray-500">Loading Configuration...</div>;
 
   return (
@@ -146,13 +160,31 @@ export default function AdminSettings() {
                     <p className="font-mono text-xs text-gray-500 truncate leading-relaxed">{src}</p>
                     <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mt-1">Slide Index: {idx + 1}</span>
                   </div>
-                  <button 
-                    onClick={() => removeImage(idx)}
-                    className="w-10 h-10 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
-                    title="Remove Slide"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => moveImageUp(idx)}
+                      disabled={idx === 0}
+                      className="w-10 h-10 bg-gray-100 text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
+                      title="Move Up"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+                    </button>
+                    <button 
+                      onClick={() => moveImageDown(idx)}
+                      disabled={idx === sliderImages.length - 1}
+                      className="w-10 h-10 bg-gray-100 text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
+                      title="Move Down"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" transform="rotate(180 12 12)" /></svg>
+                    </button>
+                    <button 
+                      onClick={() => removeImage(idx)}
+                      className="w-10 h-10 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
+                      title="Remove Slide"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
