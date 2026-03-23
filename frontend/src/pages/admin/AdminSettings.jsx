@@ -63,7 +63,7 @@ export default function AdminSettings() {
         }
       });
       // Append the new image URL returned from Multer
-      setSliderImages([...sliderImages, `${API_BASE_URL}${res.data.image}`]);
+      setSliderImages([...sliderImages, res.data.image]);
     } catch (err) {
       console.error('Upload failed', err);
       alert('Failed to upload image. Ensure it is a valid format (jpeg/png).');
@@ -154,7 +154,7 @@ export default function AdminSettings() {
               {sliderImages.map((src, idx) => (
                 <div key={idx} className="relative group border border-gray-200 rounded-lg overflow-hidden flex items-center bg-gray-50 h-32 w-full pr-4">
                   <div className="h-full w-64 bg-gray-200 flex-shrink-0">
-                    <img src={src} alt="Slider Element" className="w-full h-full object-cover" />
+                    <img src={src?.startsWith('/') ? API_BASE_URL + src : src} alt="Slider Element" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 px-6">
                     <p className="font-mono text-xs text-gray-500 truncate leading-relaxed">{src}</p>

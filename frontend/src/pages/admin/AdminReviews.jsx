@@ -80,7 +80,7 @@ export default function AdminReviews() {
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       {review.product?.image ? (
-                        <img src={review.product.image} className="w-10 h-10 rounded object-cover border border-gray-200" alt="Product" />
+                        <img src={review.product.image?.startsWith('/') ? API_BASE_URL + review.product.image : review.product.image} className="w-10 h-10 rounded object-cover border border-gray-200" alt="Product" />
                       ) : (
                         <div className="w-10 h-10 rounded bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold">NA</div>
                       )}

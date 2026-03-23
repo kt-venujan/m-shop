@@ -43,8 +43,7 @@ export default function AdminProducts() {
 
       const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
       
-      // We prepend the backend URL because the backend returns a relative path like `/uploads/file.png`
-      setCurrent({...current, image: `${API_BASE_URL}${data.image}`});
+      setCurrent({...current, image: data.image});
     } catch (err) {
       console.error(err);
       alert('Error uploading image: ' + (err.response?.data?.message || err.message));
@@ -64,7 +63,7 @@ export default function AdminProducts() {
     try {
       const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } };
       const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
-      setCurrent({...current, modelUrl: `${API_BASE_URL}${data.image}`});
+      setCurrent({...current, modelUrl: data.image});
     } catch (err) {
       alert('Error uploading model: ' + (err.response?.data?.message || err.message));
     } finally {
@@ -124,7 +123,7 @@ export default function AdminProducts() {
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 text-sm font-semibold text-gray-900 flex items-center gap-3">
-                  {p.image ? <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs">No IMG</div>}
+                  {p.image ? <img src={p.image?.startsWith('/') ? API_BASE_URL + p.image : p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs">No IMG</div>}
                   {p.name}
                 </td>
                 <td className="px-5 py-3"><span className="text-xs font-bold px-2 py-1 rounded-full bg-orange-100 text-orange-700">{p.category}</span></td>

@@ -26,7 +26,7 @@ export default function ProductList({ products, addToCart }) {
               <Link to={`/product/${product._id}`} key={product._id} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative block bg-white h-full flex flex-col justify-start">
                 <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">
                   {product.image ? (
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={product.image?.startsWith('/') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gray-50 flex flex-col items-center justify-center text-3xl">📦</div>
                   )}
@@ -56,7 +56,7 @@ export default function ProductList({ products, addToCart }) {
                   <Link to={`/?category=${encodeURIComponent(category)}`} key={idx} className="flex flex-col items-center justify-center p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative bg-white h-[160px] text-center border-b border-r border-gray-100">
                     <div className="w-[90px] h-[90px] mb-3 overflow-hidden bg-white rounded-md relative z-10 group-hover:scale-105 transition-transform flex-shrink-0 border border-gray-100">
                        {catProduct && catProduct.image ? (
-                         <img src={catProduct.image} alt={category} className="w-full h-full object-cover" />
+                         <img src={catProduct.image?.startsWith('/') ? API_BASE_URL + catProduct.image : catProduct.image} alt={category} className="w-full h-full object-cover" />
                        ) : (
                          <div className="w-full h-full bg-gray-50 rounded flex items-center justify-center text-3xl">📁</div>
                        )}
@@ -76,7 +76,7 @@ export default function ProductList({ products, addToCart }) {
               <Link to={`/product/${product._id}`} key={product._id} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative block bg-white h-full flex flex-col justify-start">
                 <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">
                   {product.image ? (
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={product.image?.startsWith('/') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gray-50 flex flex-col items-center justify-center text-3xl">📦</div>
                   )}

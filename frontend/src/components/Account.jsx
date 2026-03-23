@@ -457,7 +457,7 @@ export default function Account({ user, handleLogout }) {
 
                     <div className="flex items-center gap-4 mb-4">
                       {review.product?.image ? (
-                        <img src={review.product.image} className="w-16 h-16 rounded object-cover border border-gray-100 shadow-sm" alt="Product" />
+                        <img src={review.product.image?.startsWith('/') ? API_BASE_URL + review.product.image : review.product.image} className="w-16 h-16 rounded object-cover border border-gray-100 shadow-sm" alt="Product" />
                       ) : (
                         <div className="w-16 h-16 rounded bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold">NA</div>
                       )}
