@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
 
 export default function Hero({ settings, selectedCategory, setSelectedCategory }) {
   const bgImages = settings?.sliderImages?.length > 0 ? settings.sliderImages : [

@@ -23,7 +23,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
 import WhatsAppButton from './components/WhatsAppButton';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
 
 // Component responsible for rendering the full-screen loader between route transitions
 function RouteTransitionLoader() {
