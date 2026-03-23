@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../../config';
 
 
 export default function AdminReviews() {
@@ -117,22 +117,22 @@ export default function AdminReviews() {
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       {review.isApproved ? (
-                        <button 
+                        <button
                           onClick={() => handleApproval(review._id, false)}
                           className="px-3 py-1.5 text-xs font-bold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors"
                         >
                           Revoke
                         </button>
                       ) : (
-                        <button 
+                        <button
                           onClick={() => handleApproval(review._id, true)}
                           className="px-3 py-1.5 text-xs font-bold bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors"
                         >
                           Approve
                         </button>
                       )}
-                      
-                      <button 
+
+                      <button
                         onClick={() => handleDelete(review._id)}
                         className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors"
                         title="Delete Review"

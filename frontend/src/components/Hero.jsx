@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../config';
 
 export default function Hero({ settings, selectedCategory, setSelectedCategory }) {
   const bgImages = settings?.sliderImages?.length > 0 ? settings.sliderImages : [
@@ -28,9 +28,9 @@ export default function Hero({ settings, selectedCategory, setSelectedCategory }
               key={src}
               src={
                 src?.startsWith('http') ? src :
-                src?.startsWith('/uploads') ? API_BASE_URL + src :
-                src?.startsWith('/') ? src :
-                `${API_BASE_URL}/uploads/${src}`
+                  src?.startsWith('/uploads') ? API_BASE_URL + src :
+                    src?.startsWith('/') ? src :
+                      `${API_BASE_URL}/uploads/${src}`
               }
               alt={`E-commerce Background ${index + 1}`}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${index === currentImage ? 'opacity-70 scale-105' : 'opacity-0 scale-100'

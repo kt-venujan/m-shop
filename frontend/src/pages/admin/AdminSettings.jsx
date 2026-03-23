@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../../config';
 
 
 export default function AdminSettings() {
@@ -111,16 +111,16 @@ export default function AdminSettings() {
           <div className="flex-1">
             <label className="block text-sm font-bold text-gray-700 mb-2">Primary HEX Color</label>
             <div className="flex gap-4">
-              <input 
-                type="color" 
-                value={themeColor} 
-                onChange={(e) => setThemeColor(e.target.value)} 
+              <input
+                type="color"
+                value={themeColor}
+                onChange={(e) => setThemeColor(e.target.value)}
                 className="h-12 w-20 cursor-pointer rounded border border-gray-300 p-1"
               />
-              <input 
-                type="text" 
-                value={themeColor} 
-                onChange={(e) => setThemeColor(e.target.value)} 
+              <input
+                type="text"
+                value={themeColor}
+                onChange={(e) => setThemeColor(e.target.value)}
                 className="border border-gray-300 rounded px-4 py-2 uppercase font-mono text-sm tracking-wide focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 placeholder="#HEXCODE"
               />
@@ -143,7 +143,7 @@ export default function AdminSettings() {
             </label>
           </div>
         </div>
-        
+
         <div className="p-6">
           {sliderImages.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
@@ -161,7 +161,7 @@ export default function AdminSettings() {
                     <span className="text-[10px] uppercase font-bold text-gray-400 tracking-widest block mt-1">Slide Index: {idx + 1}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={() => moveImageUp(idx)}
                       disabled={idx === 0}
                       className="w-10 h-10 bg-gray-100 text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
@@ -169,7 +169,7 @@ export default function AdminSettings() {
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
                     </button>
-                    <button 
+                    <button
                       onClick={() => moveImageDown(idx)}
                       disabled={idx === sliderImages.length - 1}
                       className="w-10 h-10 bg-gray-100 text-gray-600 hover:bg-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
@@ -177,7 +177,7 @@ export default function AdminSettings() {
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" transform="rotate(180 12 12)" /></svg>
                     </button>
-                    <button 
+                    <button
                       onClick={() => removeImage(idx)}
                       className="w-10 h-10 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded flex items-center justify-center transition-colors shadow-sm cursor-pointer"
                       title="Remove Slide"
@@ -193,8 +193,8 @@ export default function AdminSettings() {
       </div>
 
       <div className="flex justify-end gap-4 mt-6">
-        <button 
-          onClick={handleSaveSettings} 
+        <button
+          onClick={handleSaveSettings}
           disabled={saving}
           className="bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-sm px-8 py-3 rounded-xl shadow-lg shadow-orange-600/20 active:scale-95 transition-all w-full sm:w-auto"
         >

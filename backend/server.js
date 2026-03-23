@@ -19,7 +19,8 @@ const app = express();
 app.use(express.json());
 app.use(cors({
   origin: [
-    "https://m-shopme.netlify.app"
+    "http://localhost:5173",
+    "https://m-shopme.netlify.app" // 👈 Add your Netlify link here!
   ],
   credentials: true
 }));
@@ -40,8 +41,8 @@ app.use('/api/reviews', reviewRoutes);
 // Serve images statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+// Start Server
+app.listen(5000, () => {
+  console.log("🚀 Server is running on http://localhost:5000");
 });
 

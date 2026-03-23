@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../config';
 
 
 export default function Account({ user, handleLogout }) {
   const [activeTab, setActiveTab] = useState('account');
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  
+
   // Reviews State
   const [myReviews, setMyReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -34,7 +34,7 @@ export default function Account({ user, handleLogout }) {
 
   // General Status
   const [message, setMessage] = useState('');
-  
+
   // File Upload Ref
   const fileInputRef = useRef(null);
 
@@ -102,7 +102,7 @@ export default function Account({ user, handleLogout }) {
       setPasswordMessage('Old and new password are required.');
       return;
     }
-    
+
     try {
       setPasswordMessage('Requesting OTP...');
       await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {}, getAuthHeaders());
@@ -118,7 +118,7 @@ export default function Account({ user, handleLogout }) {
 
   const handleAccountDeleteRequest = async () => {
     if (!window.confirm("Are you absolutely sure you want to permanently delete your account? This action cannot be reversed.")) return;
-    
+
     try {
       await axios.post(`${API_BASE_URL}/api/auth/request-otp`, {}, getAuthHeaders());
       setOtpAction('delete');
@@ -133,14 +133,14 @@ export default function Account({ user, handleLogout }) {
   const submitOtp = async (e) => {
     e.preventDefault();
     if (!otpCode) return setOtpMessage('Please enter the OTP');
-    
+
     setOtpLoading(true);
     try {
       if (otpAction === 'password') {
         await axios.put(`${API_BASE_URL}/api/auth/password`, {
           oldPassword, newPassword, otpCode
         }, getAuthHeaders());
-        
+
         setShowOtpModal(false);
         setOldPassword('');
         setNewPassword('');
@@ -151,7 +151,7 @@ export default function Account({ user, handleLogout }) {
           headers: getAuthHeaders().headers,
           data: { otpCode } // axios delete payload uses 'data' key
         });
-        
+
         setShowOtpModal(false);
         handleLogout();
         window.location.href = '/';
@@ -172,9 +172,9 @@ export default function Account({ user, handleLogout }) {
 
     try {
       const res = await axios.put(`${API_BASE_URL}/api/auth/profile-picture`, formData, {
-        headers: { 
+        headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${localStorage.getItem('mern_token')}` 
+          Authorization: `Bearer ${localStorage.getItem('mern_token')}`
         }
       });
       setProfilePicture(res.data.user.profilePicture);
@@ -210,11 +210,11 @@ export default function Account({ user, handleLogout }) {
 
   return (
     <div data-aos="fade-up" className="max-w-6xl mx-auto md:my-10 bg-white md:shadow-xl md:rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-[800px] border border-gray-100 relative">
-      
+
       {/* Sidebar Panel */}
       <div className="w-full md:w-[280px] bg-white flex-shrink-0 border-b md:border-b-0 md:border-r border-[#eaedf3] p-4 md:p-6 flex flex-col">
         <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">Settings</h2>
-        
+
         <div className="relative mb-8 pt-1">
           <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input type="text" placeholder="Search Settings" className="w-full bg-white border border-gray-200 shadow-sm rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all text-gray-700 placeholder-gray-400" />
@@ -225,7 +225,7 @@ export default function Account({ user, handleLogout }) {
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             Account
           </button>
-          
+
           <button onClick={() => setActiveTab('orders')} className={`flex-none md:w-full flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl text-[13px] md:text-sm font-semibold transition-all whitespace-nowrap ${activeTab === 'orders' ? 'bg-orange-50 text-orange-600' : 'text-gray-500 hover:bg-orange-50 hover:text-orange-600'}`}>
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             My Orders
@@ -252,12 +252,12 @@ export default function Account({ user, handleLogout }) {
 
       {/* Main Content Pane */}
       <div className="flex-1 w-full md:w-auto bg-white overflow-y-auto">
-        
+
         {/* Account Settings View */}
         {activeTab === 'account' && (
           <div className="w-full max-w-3xl mx-auto py-8 md:py-12 px-4 md:px-10">
             {message && <div className="mb-6 bg-green-50 text-green-700 px-4 py-3 rounded-lg text-sm font-medium border border-green-200">{message}</div>}
-            
+
             {/* Basic Information Section */}
             <form onSubmit={handleProfileUpdate}>
               <div className="flex items-center gap-3 mb-8">
@@ -266,7 +266,7 @@ export default function Account({ user, handleLogout }) {
               </div>
 
               <div className="flex flex-col md:flex-row gap-12 border-b border-gray-100 pb-12 mb-10">
-                
+
                 {/* Avatar Section */}
                 <div className="flex flex-col items-center flex-shrink-0">
                   <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-white shadow-md overflow-hidden flex items-center justify-center text-3xl font-bold text-gray-300 mb-4 bg-cover bg-center" style={{ backgroundImage: profilePicture ? `url(${API_BASE_URL}${profilePicture})` : 'none' }}>
@@ -316,7 +316,7 @@ export default function Account({ user, handleLogout }) {
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
                   <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all font-medium" />
                 </div>
-                
+
                 <div className="pt-4">
                   <button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-colors w-full sm:w-auto">Save Basic & Account Changes</button>
                 </div>
@@ -324,13 +324,13 @@ export default function Account({ user, handleLogout }) {
             </form>
 
             <div className="border-t border-gray-100 my-8"></div>
-            
+
             {/* Password Change Sub-section */}
             <form onSubmit={handlePasswordUpdate}>
               <div className="space-y-5 md:w-2/3 ml-auto md:ml-36 pl-0 md:pl-2">
                 <h4 className="text-sm font-bold text-gray-900 mb-2">Change Password</h4>
                 {passwordMessage && <div className="text-xs font-semibold text-orange-600 mb-2">{passwordMessage}</div>}
-                
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">Current Password</label>
                   <input type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all" placeholder="•••••••••" />
@@ -339,13 +339,13 @@ export default function Account({ user, handleLogout }) {
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">New Password</label>
                   <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full border border-gray-200 bg-[#eef1f6] rounded-md px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 transition-all" placeholder="•••••••••" />
                 </div>
-                
+
                 <div className="pt-2">
                   <button type="submit" className="border-2 border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 px-6 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto">Request Password Change</button>
                 </div>
               </div>
             </form>
-            
+
             {/* Delete Account Sub-section */}
             <div className="border-t border-gray-100 my-8"></div>
             <div className="space-y-3 md:w-2/3 ml-auto md:ml-36 pl-0 md:pl-2">
@@ -361,7 +361,7 @@ export default function Account({ user, handleLogout }) {
         {activeTab === 'orders' && (
           <div className="max-w-4xl mx-auto py-12 px-10">
             <h2 className="text-[24px] font-bold text-gray-900 mb-8">My Orders</h2>
-            
+
             {loadingOrders ? (
               <div className="py-20 text-center text-gray-400 font-bold animate-pulse">Loading order history...</div>
             ) : orders.length === 0 ? (
@@ -377,13 +377,13 @@ export default function Account({ user, handleLogout }) {
                   <div key={order._id} className="border border-gray-200 rounded-xl p-6 bg-white overflow-hidden relative group shadow-sm hover:shadow-md transition-all">
                     {/* Status Badge */}
                     <div className="absolute top-6 right-6 flex items-center gap-2">
-                       <span className={`h-2.5 w-2.5 rounded-full ${order.status === 'Processing' ? 'bg-orange-400 animate-pulse' : order.status === 'Shipped' ? 'bg-blue-500' : order.status === 'Delivered' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-                       <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{order.status}</span>
+                      <span className={`h-2.5 w-2.5 rounded-full ${order.status === 'Processing' ? 'bg-orange-400 animate-pulse' : order.status === 'Shipped' ? 'bg-blue-500' : order.status === 'Delivered' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{order.status}</span>
                     </div>
 
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Order ID</p>
                     <p className="text-lg font-extrabold text-[#212121] mb-6">#{order._id.substring(order._id.length - 10).toUpperCase()}</p>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                       <div>
                         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Items Purchased</p>
@@ -396,8 +396,8 @@ export default function Account({ user, handleLogout }) {
                           ))}
                         </div>
                         <div className="mt-4 flex justify-between items-end border-t border-gray-100 pt-4">
-                           <span className="text-sm font-bold text-gray-500 tracking-wide uppercase">Order Total</span>
-                           <span className="text-xl font-extrabold text-[#f57224]">Rs. {order.totalAmount.toLocaleString('en-IN')}</span>
+                          <span className="text-sm font-bold text-gray-500 tracking-wide uppercase">Order Total</span>
+                          <span className="text-xl font-extrabold text-[#f57224]">Rs. {order.totalAmount.toLocaleString('en-IN')}</span>
                         </div>
                       </div>
 
@@ -405,10 +405,10 @@ export default function Account({ user, handleLogout }) {
                         <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Shipping Destination</p>
                         <div className="bg-orange-50/30 p-4 rounded-lg flex-1 border border-orange-100 relative">
                           <p className="text-[13px] text-gray-700 leading-relaxed font-medium pr-10">{order.shippingAddress}</p>
-                          
+
                           {/* Restricting Edit Functionality to Processing Orders Only */}
                           {order.status === 'Processing' && (
-                            <button 
+                            <button
                               onClick={() => {
                                 const newAddr = prompt("Update Shipping Address:", order.shippingAddress);
                                 if (newAddr && newAddr !== order.shippingAddress) {
@@ -435,7 +435,7 @@ export default function Account({ user, handleLogout }) {
         {activeTab === 'reviews' && (
           <div className="max-w-4xl mx-auto py-12 px-10">
             <h2 className="text-[24px] font-bold text-gray-900 mb-8">My Reviews</h2>
-            
+
             {loadingReviews ? (
               <div className="py-20 text-center text-gray-400 font-bold animate-pulse">Loading reviews...</div>
             ) : myReviews.length === 0 ? (
@@ -449,10 +449,10 @@ export default function Account({ user, handleLogout }) {
               <div className="space-y-6">
                 {myReviews.map(review => (
                   <div key={review._id} className="border border-gray-200 rounded-xl p-6 bg-white overflow-hidden relative group shadow-sm hover:shadow-md transition-all">
-                    
+
                     <div className="absolute top-6 right-6 flex items-center gap-2">
-                       <span className={`h-2.5 w-2.5 rounded-full ${review.isApproved ? 'bg-green-500' : 'bg-amber-400 animate-pulse'}`}></span>
-                       <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{review.isApproved ? 'Published' : 'Pending Approval'}</span>
+                      <span className={`h-2.5 w-2.5 rounded-full ${review.isApproved ? 'bg-green-500' : 'bg-amber-400 animate-pulse'}`}></span>
+                      <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">{review.isApproved ? 'Published' : 'Pending Approval'}</span>
                     </div>
 
                     <div className="flex items-center gap-4 mb-4">
@@ -472,10 +472,10 @@ export default function Account({ user, handleLogout }) {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="bg-gray-50 border border-gray-100 rounded-lg p-4 relative">
-                       <svg className="w-6 h-6 text-gray-300 absolute top-2 left-2" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
-                       <p className="text-sm text-gray-700 italic pl-6 leading-relaxed">{review.comment}</p>
+                      <svg className="w-6 h-6 text-gray-300 absolute top-2 left-2" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
+                      <p className="text-sm text-gray-700 italic pl-6 leading-relaxed">{review.comment}</p>
                     </div>
 
                   </div>
@@ -486,20 +486,20 @@ export default function Account({ user, handleLogout }) {
         )}
 
       </div>
-      
+
       {/* OTP Verification Modal */}
       {showOtpModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-[authFade_0.3s_ease-out]">
             <h3 className="text-lg font-extrabold text-gray-900 mb-2">Security Verification</h3>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">{otpMessage}</p>
-            
+
             <form onSubmit={submitOtp}>
               <div className="mb-5">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
-                  placeholder="Enter 6-digit OTP" 
+                  placeholder="Enter 6-digit OTP"
                   value={otpCode}
                   onChange={e => setOtpCode(e.target.value)}
                   className="w-full text-center text-2xl tracking-[0.5em] font-black border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -516,7 +516,7 @@ export default function Account({ user, handleLogout }) {
           </div>
         </div>
       )}
-      
+
     </div>
   );
 }

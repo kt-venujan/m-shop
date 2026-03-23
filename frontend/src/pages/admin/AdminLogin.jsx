@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../../config';
 
 
 export default function AdminLogin() {
@@ -19,9 +19,9 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
-      
+
       const { user, token } = res.data;
-      
+
       if (!user.isAdmin) {
         setError("Access Denied: You are not an administrator.");
         setLoading(false);
@@ -31,10 +31,10 @@ export default function AdminLogin() {
       // Save strictly to independent Admin tokens so it doesn't collide with Customer Sessions.
       localStorage.setItem('admin_token', token);
       localStorage.setItem('admin_user', JSON.stringify(user));
-      
+
       // Redirect to the dashboard
       navigate('/admin');
-      
+
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid credentials');
     } finally {
@@ -53,14 +53,14 @@ export default function AdminLogin() {
             Sign in to manage the shop
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-bold text-center border border-red-100">
               {error}
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Email Address</label>

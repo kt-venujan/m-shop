@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../../config';
 
 
 export default function AdminProducts() {
@@ -28,7 +28,7 @@ export default function AdminProducts() {
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     const formData = new FormData();
     formData.append('image', file);
     setUploading(true);
@@ -42,8 +42,8 @@ export default function AdminProducts() {
       };
 
       const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
-      
-      setCurrent({...current, image: data.image});
+
+      setCurrent({ ...current, image: data.image });
     } catch (err) {
       console.error(err);
       alert('Error uploading image: ' + (err.response?.data?.message || err.message));
@@ -55,7 +55,7 @@ export default function AdminProducts() {
   const uploadModelHandler = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     const formData = new FormData();
     formData.append('image', file); // uploadRoutes.js uses 'image' field for all general uploads
     setUploadingModel(true);
@@ -63,7 +63,7 @@ export default function AdminProducts() {
     try {
       const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } };
       const { data } = await axios.post(`${API_BASE_URL}/api/upload`, formData, config);
-      setCurrent({...current, modelUrl: data.image});
+      setCurrent({ ...current, modelUrl: data.image });
     } catch (err) {
       alert('Error uploading model: ' + (err.response?.data?.message || err.message));
     } finally {
@@ -148,10 +148,10 @@ export default function AdminProducts() {
               <button onClick={() => setModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
-              <input required placeholder="Product Name" value={current.name} onChange={e => setCurrent({...current, name: e.target.value})} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
-              
+              <input required placeholder="Product Name" value={current.name} onChange={e => setCurrent({ ...current, name: e.target.value })} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+
               <div className="flex gap-2 items-center">
-                <input placeholder="Image URL (or select file)" value={current.image || ''} onChange={e => setCurrent({...current, image: e.target.value})} className="flex-1 border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+                <input placeholder="Image URL (or select file)" value={current.image || ''} onChange={e => setCurrent({ ...current, image: e.target.value })} className="flex-1 border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
                 <label className="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 text-sm font-bold py-2.5 px-3 rounded-lg cursor-pointer whitespace-nowrap transition-colors">
                   {uploading ? 'Uploading...' : 'Choose File'}
                   <input type="file" className="hidden" onChange={uploadFileHandler} disabled={uploading} accept="image/*" />
@@ -159,7 +159,7 @@ export default function AdminProducts() {
               </div>
 
               <div className="flex gap-2 items-center">
-                <input placeholder="3D Model GLB URL (or select file)" value={current.modelUrl || ''} onChange={e => setCurrent({...current, modelUrl: e.target.value})} className="flex-1 border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+                <input placeholder="3D Model GLB URL (or select file)" value={current.modelUrl || ''} onChange={e => setCurrent({ ...current, modelUrl: e.target.value })} className="flex-1 border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
                 <label className="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 text-sm font-bold py-2.5 px-3 rounded-lg cursor-pointer whitespace-nowrap transition-colors">
                   {uploadingModel ? 'Uploading...' : 'Choose GLB'}
                   <input type="file" className="hidden" onChange={uploadModelHandler} disabled={uploadingModel} accept=".glb,.gltf" />
@@ -167,10 +167,10 @@ export default function AdminProducts() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <input required type="number" min="0" step="0.01" placeholder="Price" value={current.price} onChange={e => setCurrent({...current, price: parseFloat(e.target.value) || ''})} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
-                <input type="number" min="0" placeholder="Stock" value={current.stock} onChange={e => setCurrent({...current, stock: parseInt(e.target.value) || ''})} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+                <input required type="number" min="0" step="0.01" placeholder="Price" value={current.price} onChange={e => setCurrent({ ...current, price: parseFloat(e.target.value) || '' })} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+                <input type="number" min="0" placeholder="Stock" value={current.stock} onChange={e => setCurrent({ ...current, stock: parseInt(e.target.value) || '' })} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
               </div>
-              <select required value={current.category} onChange={e => setCurrent({...current, category: e.target.value})} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none bg-white">
+              <select required value={current.category} onChange={e => setCurrent({ ...current, category: e.target.value })} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none bg-white">
                 <option value="">Select Category</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Clothing">Clothing</option>
@@ -178,7 +178,7 @@ export default function AdminProducts() {
                 <option value="Beauty">Beauty</option>
                 <option value="Sports">Sports</option>
               </select>
-              <textarea rows="2" placeholder="Description" value={current.description} onChange={e => setCurrent({...current, description: e.target.value})} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
+              <textarea rows="2" placeholder="Description" value={current.description} onChange={e => setCurrent({ ...current, description: e.target.value })} className="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none" />
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setModal(false)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
                 <button type="submit" className="px-4 py-2 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-lg">Save</button>

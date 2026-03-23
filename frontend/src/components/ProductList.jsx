@@ -1,19 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../config';
 
 export default function ProductList({ products, addToCart }) {
   // Extract unique categories from actual products
   const uniqueCategories = [...new Set(products.map(p => p.category))].filter(Boolean);
-  
+
   // Flash sale products (using the first 6 products as flash sale items)
   const flashProducts = products.slice(0, 6);
 
   return (
     <section id="products" className="py-8 bg-[#f5f5f5] min-h-screen">
       <div className="max-w-[1200px] mx-auto px-0 sm:px-4 space-y-6">
-        
+
         {/* Flash Sale Section */}
         <div>
           <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight">Flash Sale</h2>
@@ -22,7 +22,7 @@ export default function ProductList({ products, addToCart }) {
               <span className="text-orange-500 font-medium text-sm">On Sale Now</span>
             </div>
           </div>
-          
+
           <div data-aos="fade-up" data-aos-delay="100" className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100 shadow-sm border-b border-gray-100">
             {flashProducts.map(product => (
               <Link to={`/product/${product._id}`} key={product._id} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative block bg-white h-full flex flex-col justify-start">
@@ -57,11 +57,11 @@ export default function ProductList({ products, addToCart }) {
                 return (
                   <Link to={`/?category=${encodeURIComponent(category)}`} key={idx} className="flex flex-col items-center justify-center p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative bg-white h-[160px] text-center border-b border-r border-gray-100">
                     <div className="w-[90px] h-[90px] mb-3 overflow-hidden bg-white rounded-md relative z-10 group-hover:scale-105 transition-transform flex-shrink-0 border border-gray-100">
-                       {catProduct && catProduct.image ? (
-                         <img src={catProduct.image?.startsWith('/uploads') ? API_BASE_URL + catProduct.image : catProduct.image} alt={category} className="w-full h-full object-cover" />
-                       ) : (
-                         <div className="w-full h-full bg-gray-50 rounded flex items-center justify-center text-3xl">📁</div>
-                       )}
+                      {catProduct && catProduct.image ? (
+                        <img src={catProduct.image?.startsWith('/uploads') ? API_BASE_URL + catProduct.image : catProduct.image} alt={category} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-50 rounded flex items-center justify-center text-3xl">📁</div>
+                      )}
                     </div>
                     <span className="text-[13px] text-[#212121] leading-tight group-hover:text-orange-500 transition-colors line-clamp-2 px-1">{category}</span>
                   </Link>

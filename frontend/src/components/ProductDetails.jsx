@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../config';
 
 
 export default function ProductDetails({ products, addToCart }) {
@@ -69,7 +69,7 @@ export default function ProductDetails({ products, addToCart }) {
       </div>
     );
   }
-  
+
   const discountPrice = typeof product.price === 'number' ? product.price : parseFloat(product.price || 0);
   const originalPrice = discountPrice * 2; // Mock original price 50% more
 
@@ -94,10 +94,10 @@ export default function ProductDetails({ products, addToCart }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
-          
+
           {/* Top 3-Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8">
-            
+
             <div className="lg:col-span-4 flex flex-col items-center select-none">
               <div className="w-full aspect-square bg-[#f2f2f2] border border-gray-100 rounded-sm overflow-hidden flex items-center justify-center mb-4 relative group">
                 {viewMode === '3D' ? (
@@ -114,44 +114,44 @@ export default function ProductDetails({ products, addToCart }) {
                     <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" />
                   ) : (
                     <span className="text-9xl drop-shadow-lg transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500">
-                      {product.category === 'Electronics' ? '💻' : 
-                       product.category === 'Clothing' ? '👕' : 
-                       product.category === 'Sports' ? '⚽' :
-                       product.category === 'Beauty' ? '💄' : '🛍️'}
+                      {product.category === 'Electronics' ? '💻' :
+                        product.category === 'Clothing' ? '👕' :
+                          product.category === 'Sports' ? '⚽' :
+                            product.category === 'Beauty' ? '💄' : '🛍️'}
                     </span>
                   )
                 )}
-                
+
                 {/* View Mode Toggle Pill */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md rounded-full shadow-lg p-1 flex gap-1 z-10 border border-gray-200">
-                  <button 
-                    onClick={() => setViewMode('2D')} 
+                  <button
+                    onClick={() => setViewMode('2D')}
                     className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide transition-all ${viewMode === '2D' ? 'bg-black text-white shadow' : 'text-gray-600 hover:text-black hover:bg-white'} focus:outline-none`}
                   >
                     2D Image
                   </button>
-                  <button 
-                    onClick={() => setViewMode('3D')} 
+                  <button
+                    onClick={() => setViewMode('3D')}
                     className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide transition-all flex items-center gap-1.5 ${viewMode === '3D' ? 'bg-orange-600 text-white shadow' : 'text-gray-600 hover:text-orange-600 hover:bg-white'} focus:outline-none`}
                   >
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
                     Interactive 3D
                   </button>
                 </div>
-                
+
                 {/* Discount Badge overlay */}
                 <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded pointer-events-none z-20">
                   -50%
                 </div>
               </div>
             </div>
-            
+
             {/* Column 2: Product Core Details (Center - width 5) */}
             <div className="lg:col-span-5 flex flex-col relative">
               <h1 className="text-[22px] font-semibold text-gray-900 leading-snug mb-3">
                 {product.name}
               </h1>
-              
+
               {/* Ratings & Brand Row */}
               <div className="flex items-center gap-4 text-sm mb-4 pb-4">
                 <div className="flex items-center text-[#f57224] text-lg">
@@ -179,50 +179,50 @@ export default function ProductDetails({ products, addToCart }) {
                 </div>
                 <div className="mt-4 flex items-center gap-2">
                   <span className="text-xs text-black border border-orange-500 rounded px-2 py-0.5 whitespace-nowrap bg-orange-50">Installment</span>
-                  <span className="text-xs text-gray-600">Up to 3 months, as low as Rs. {(discountPrice/3).toFixed(0)} per month.</span>
+                  <span className="text-xs text-gray-600">Up to 3 months, as low as Rs. {(discountPrice / 3).toFixed(0)} per month.</span>
                 </div>
               </div>
 
               <div className="border-t border-gray-100 pt-6 mb-6">
 
-                 {/* Quantity Selector */}
-                 <div className="mb-8 flex items-center gap-4">
-                   <p className="text-gray-500 text-sm w-16">Quantity</p>
-                   <div className="flex items-center">
-                     <button onClick={handleDecrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-l border border-gray-300 border-r-0">-</button>
-                     <input type="text" value={quantity} readOnly className="w-12 h-9 text-center text-sm font-semibold outline-none border-y border-gray-300 pointer-events-none" />
-                     <button onClick={handleIncrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-r border border-gray-300 border-l-0">+</button>
-                   </div>
-                 </div>
+                {/* Quantity Selector */}
+                <div className="mb-8 flex items-center gap-4">
+                  <p className="text-gray-500 text-sm w-16">Quantity</p>
+                  <div className="flex items-center">
+                    <button onClick={handleDecrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-l border border-gray-300 border-r-0">-</button>
+                    <input type="text" value={quantity} readOnly className="w-12 h-9 text-center text-sm font-semibold outline-none border-y border-gray-300 pointer-events-none" />
+                    <button onClick={handleIncrease} className="w-9 h-9 flex items-center justify-center bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 transition-colors text-xl focus:outline-none rounded-r border border-gray-300 border-l-0">+</button>
+                  </div>
+                </div>
 
-                 {/* Buy Buttons */}
-                 <div className="flex gap-2 sm:gap-4 mt-auto">
-                   <button 
-                     onClick={handleBuyNow}
-                     className="flex-1 bg-[#2abbe8] hover:bg-[#1bb0da] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#2abbe8] focus:ring-offset-1"
-                   >
-                     Buy Now
-                   </button>
-                   <button 
-                     onClick={() => addToCart(product, quantity)}
-                     className="flex-1 bg-[#f57224] hover:bg-[#e0621b] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#f57224] focus:ring-offset-1"
-                   >
-                     Add to Cart
-                   </button>
-                 </div>
+                {/* Buy Buttons */}
+                <div className="flex gap-2 sm:gap-4 mt-auto">
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 bg-[#2abbe8] hover:bg-[#1bb0da] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#2abbe8] focus:ring-offset-1"
+                  >
+                    Buy Now
+                  </button>
+                  <button
+                    onClick={() => addToCart(product, quantity)}
+                    className="flex-1 bg-[#f57224] hover:bg-[#e0621b] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#f57224] focus:ring-offset-1"
+                  >
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-            
+
             {/* Column 3: Logistics & Seller (Right - width 3) */}
             <div className="lg:col-span-3 bg-[#fafafa] p-4 lg:p-0 lg:bg-transparent rounded-md lg:rounded-none flex flex-col gap-0 divide-y divide-gray-100 border border-gray-200 lg:border-none">
-              
+
               {/* Delivery Options */}
               <div className="pb-4">
                 <div className="flex justify-between items-center mb-4 lg:pr-2">
                   <h3 className="text-xs text-gray-500 font-bold uppercase tracking-wide">Delivery Options</h3>
                   <svg className="w-4 h-4 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                
+
                 <div className="flex gap-3 mb-4 items-start">
                   <svg className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                   <div className="text-sm border-r border-gray-200 pr-3 flex-1 min-w-[50%]">
@@ -270,9 +270,9 @@ export default function ProductDetails({ products, addToCart }) {
 
             </div>
           </div>
-          
+
         </div>
-        
+
         {/* NEW PRODUCT DESCRIPTION SECTION */}
         <div className="bg-white p-6 md:p-10 rounded-lg shadow-sm border border-gray-200 mt-6 lg:mr-[26%]">
           <h2 className="text-lg font-bold bg-gray-50 inline-block px-4 py-2 border-l-4 border-orange-500 mb-6 text-gray-800">Product Details of {product.name}</h2>
@@ -280,7 +280,7 @@ export default function ProductDetails({ products, addToCart }) {
             <p className="mb-6 font-medium">
               {product.description || "Unleash the power of premium quality with this brand new item. Designed with meticulous attention to detail and engineered for peak performance, this product stands out as an indispensable addition to your collection. Whether you're upgrading your lifestyle or searching for the perfect gift, our selection guarantees unmatched durability and cutting-edge features."}
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-6 rounded border border-gray-100 mb-6">
               <ul className="list-disc pl-5 space-y-3 font-medium text-gray-600">
                 <li>High quality guarantee with a robust 6 months warranty.</li>
@@ -295,7 +295,7 @@ export default function ProductDetails({ products, addToCart }) {
                 <li>Includes official packaging box and standard usage manual guides.</li>
               </ul>
             </div>
-            
+
             <div className="mt-8 text-center text-sm text-gray-400 italic">
               * Please note that actual item colors may vary slightly from the images due to display settings or manufacturer changes.
             </div>
@@ -307,9 +307,9 @@ export default function ProductDetails({ products, addToCart }) {
           <div className="flex items-center gap-4 mb-8 border-b border-gray-100 pb-4">
             <h2 className="text-2xl font-extrabold text-gray-900">Customer Reviews</h2>
             <div className="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full border border-orange-100">
-               <span className="text-orange-600 font-black text-sm">{averageRating}</span>
-               <svg className="w-4 h-4 text-orange-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-               <span className="text-gray-500 text-xs font-bold">({reviews.length})</span>
+              <span className="text-orange-600 font-black text-sm">{averageRating}</span>
+              <svg className="w-4 h-4 text-orange-500 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+              <span className="text-gray-500 text-xs font-bold">({reviews.length})</span>
             </div>
           </div>
 
@@ -319,7 +319,7 @@ export default function ProductDetails({ products, addToCart }) {
             {user ? (
               <form onSubmit={handleSubmitReview}>
                 {reviewMessage && <div className="mb-4 text-sm font-bold text-orange-600 bg-orange-50 px-4 py-3 rounded border border-orange-100">{reviewMessage}</div>}
-                
+
                 <div className="mb-4">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Rating</label>
                   <div className="flex gap-2">
@@ -357,7 +357,7 @@ export default function ProductDetails({ products, addToCart }) {
                 <div key={rev._id} className="border-b border-gray-100 pb-6 last:border-0">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center font-bold text-gray-500 uppercase">
-                      {rev.user?.name?.substring(0,2) || 'US'}
+                      {rev.user?.name?.substring(0, 2) || 'US'}
                     </div>
                     <div>
                       <span className="font-bold text-gray-900 text-sm block">{rev.user?.name || 'Verified Buyer'}</span>
@@ -378,7 +378,7 @@ export default function ProductDetails({ products, addToCart }) {
         </div>
 
       </div>
-      
+
       {showLocationModal && (
         <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm animate-[authFade_0.3s_ease-out]">
@@ -386,7 +386,7 @@ export default function ProductDetails({ products, addToCart }) {
             <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2">
               {['Western, Colombo 1-15, Colombo 01 - Fort', 'Central, Kandy, Kandy Town Center', 'Southern, Galle, Galle Fort Area', 'Northern, Jaffna, Jaffna Town'].map(loc => (
                 <div key={loc} onClick={() => { setDeliveryLocation(loc); setShowLocationModal(false); }} className={`p-3 rounded border cursor-pointer transition-colors ${deliveryLocation === loc ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-orange-300'}`}>
-                   <p className="text-sm font-semibold text-gray-800 leading-tight">{loc}</p>
+                  <p className="text-sm font-semibold text-gray-800 leading-tight">{loc}</p>
                 </div>
               ))}
             </div>

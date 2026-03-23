@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from '../config';
 
 
 export default function Checkout({ cart, user, clearCart }) {
@@ -36,7 +36,7 @@ export default function Checkout({ cart, user, clearCart }) {
       navigate('/auth');
       return;
     }
-    
+
     try {
       const token = localStorage.getItem('mern_token');
       const orderData = {
@@ -48,10 +48,10 @@ export default function Checkout({ cart, user, clearCart }) {
       await axios.post(`${API_BASE_URL}/api/orders`, orderData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setIsSuccess(true);
       if (clearCart) clearCart();
-      window.scrollTo(0,0);
+      window.scrollTo(0, 0);
     } catch (err) {
       console.error("Order failed:", err);
       alert("There was an error processing your order. Please try again.");
@@ -78,17 +78,17 @@ export default function Checkout({ cart, user, clearCart }) {
   return (
     <div data-aos="fade-up" className="bg-[#f5f5f5] min-h-screen py-8 pb-32">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
-        
+
         {/* Left Column (Width 8) */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          
+
           {/* Shipping & Billing Box */}
           <div className="bg-white p-6 shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
               <h2 className="text-gray-800 font-bold text-[15px]">Shipping & Billing</h2>
               <button onClick={() => setShowAddressModal(true)} className="text-[#1a9cb7] font-bold text-xs uppercase hover:underline focus:outline-none">EDIT</button>
             </div>
-            
+
             <div className="text-[13px] text-gray-800 font-medium">
               <div className="flex gap-4 mb-2 bg-white">
                 <span className="text-gray-900">{customer.name}</span>
@@ -101,16 +101,16 @@ export default function Checkout({ cart, user, clearCart }) {
                 </span>
               </div>
             </div>
-            
+
             {/* Collect Info */}
             <div className="border border-[#1a9cb7] border-dashed rounded p-3 bg-[#f3f9fb] flex justify-between items-center w-full lg:w-[80%]">
-               <div>
-                 <p className="text-[#1a9cb7] text-[13px] font-semibold hover:underline cursor-pointer flex items-center">Collect your parcels from a nearby location at a minimal delivery fee. <span className="ml-1 mt-0.5 text-lg leading-none">&rsaquo;</span></p>
-                 <div className="flex items-center gap-1 mt-1 text-[12px] text-gray-400 font-medium">
-                   <span>1 suggested collection point(s) nearby</span>
-                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                 </div>
-               </div>
+              <div>
+                <p className="text-[#1a9cb7] text-[13px] font-semibold hover:underline cursor-pointer flex items-center">Collect your parcels from a nearby location at a minimal delivery fee. <span className="ml-1 mt-0.5 text-lg leading-none">&rsaquo;</span></p>
+                <div className="flex items-center gap-1 mt-1 text-[12px] text-gray-400 font-medium">
+                  <span>1 suggested collection point(s) nearby</span>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -123,7 +123,7 @@ export default function Checkout({ cart, user, clearCart }) {
 
             <div className="p-6 border-b border-gray-100">
               <p className="text-[11px] text-gray-600 mb-3 uppercase font-semibold">Delivery or Pickup</p>
-              
+
               <div className="border border-[#1a9cb7] rounded p-4 w-full sm:w-[280px] bg-white relative cursor-pointer relative overflow-hidden transition-shadow shadow-sm ring-1 ring-[#1a9cb7] ring-opacity-20">
                 <div className="flex gap-4">
                   <div className="w-5 h-5 rounded-full bg-[#1a9cb7] flex items-center justify-center flex-shrink-0 mt-0.5 text-white">
@@ -149,19 +149,19 @@ export default function Checkout({ cart, user, clearCart }) {
                 <div key={item._id} className="flex flex-col sm:flex-row gap-4 py-5 border-b border-gray-50 last:border-0 relative">
                   <div className="w-20 h-20 bg-gray-50 rounded-sm flex items-center justify-center border border-gray-200 shadow-sm shrink-0">
                     <span className="text-4xl drop-shadow-sm">
-                      {item.name.toLowerCase().includes('shirt') ? '👕' : 
-                       item.name.toLowerCase().includes('shoe') ? '👟' : 
-                       item.name.toLowerCase().includes('hat') ? '🧢' :
-                       item.category === 'Electronics' ? '📱' : '🔌'}
+                      {item.name.toLowerCase().includes('shirt') ? '👕' :
+                        item.name.toLowerCase().includes('shoe') ? '👟' :
+                          item.name.toLowerCase().includes('hat') ? '🧢' :
+                            item.category === 'Electronics' ? '📱' : '🔌'}
                     </span>
                   </div>
-                  
+
                   <div className="flex-1 flex justify-between pr-0 sm:pr-8 items-start">
                     <div className="max-w-[100%] sm:max-w-[70%]">
                       <h3 className="text-[14px] text-gray-800 line-clamp-2 leading-snug">{item.name}</h3>
                       <p className="text-[11px] text-gray-400 mt-2 truncate font-medium">No Brand, Color Family:4 Port 3.1A</p>
                     </div>
-                    
+
                     <div className="text-right sm:ml-4 whitespace-nowrap mt-2 sm:mt-0 relative right-0 top-0">
                       <p className="text-[16px] font-semibold text-[#f57224] tracking-tight">Rs. {typeof item.price === 'number' ? item.price : parseFloat(item.price)}</p>
                       <p className="text-[11px] text-gray-400 line-through mt-0.5">Rs. {typeof item.price === 'number' ? (item.price * 2).toFixed(0) : parseFloat(item.price) * 2}</p>
@@ -179,7 +179,7 @@ export default function Checkout({ cart, user, clearCart }) {
 
         {/* Right Column (Width 4) */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          
+
           {/* Promotion / Voucher */}
           <div className="bg-white px-5 py-6 shadow-sm border border-gray-100 h-fit">
             <h2 className="text-gray-800 font-semibold mb-4 text-[13px]">Promotion</h2>
@@ -188,7 +188,7 @@ export default function Checkout({ cart, user, clearCart }) {
               <button onClick={handleApplyPromo} className="bg-[#1a9cb7] text-white font-bold text-[12px] px-8 hover:bg-[#128198] transition-colors h-full rounded-r-sm border border-[#1a9cb7]">APPLY</button>
             </div>
             {discount > 0 && <p className="text-green-600 text-xs font-bold mt-[-16px] mb-6">Code saved you Rs. {discount.toFixed(0)}!</p>}
-            
+
             <div className="border-t border-gray-100 pt-4 flex justify-between items-center group">
               <h2 className="text-gray-600 font-medium text-[13px]">Invoice and Contact Info</h2>
               <button onClick={() => setShowAddressModal(true)} className="text-[#1a9cb7] font-bold text-xs hover:underline focus:outline-none">Edit</button>
@@ -198,7 +198,7 @@ export default function Checkout({ cart, user, clearCart }) {
           {/* Order Summary */}
           <div className="bg-white px-5 py-6 shadow-sm border border-gray-100 h-fit">
             <h2 className="text-[15px] font-semibold text-gray-800 mb-6 tracking-tighter border-b border-gray-50 pb-2">Order Summary</h2>
-            
+
             <div className="space-y-4 text-[13px] text-gray-500 font-medium mb-8">
               <div className="flex justify-between items-end">
                 <span>Items Total ({cart.reduce((t, i) => t + i.quantity, 0)} Items)</span>
@@ -228,7 +228,7 @@ export default function Checkout({ cart, user, clearCart }) {
               Proceed to Pay
             </button>
           </div>
-          
+
         </div>
       </div>
 
@@ -240,15 +240,15 @@ export default function Checkout({ cart, user, clearCart }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Full Name</label>
-                <input type="text" value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none" />
+                <input type="text" value={customer.name} onChange={(e) => setCustomer({ ...customer, name: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Phone Number</label>
-                <input type="text" value={customer.phone} onChange={(e) => setCustomer({...customer, phone: e.target.value})} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none" />
+                <input type="text" value={customer.phone} onChange={(e) => setCustomer({ ...customer, phone: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none" />
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Delivery Address</label>
-                <textarea rows="3" value={customer.address} onChange={(e) => setCustomer({...customer, address: e.target.value})} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none"></textarea>
+                <textarea rows="3" value={customer.address} onChange={(e) => setCustomer({ ...customer, address: e.target.value })} className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#1a9cb7] focus:outline-none"></textarea>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setShowAddressModal(false)} className="flex-1 bg-gray-100 text-gray-700 font-bold py-2 rounded shadow-sm text-sm border border-gray-200 hover:bg-gray-200 transition-colors focus:outline-none">CANCEL</button>

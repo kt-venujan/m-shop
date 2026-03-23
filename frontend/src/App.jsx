@@ -23,7 +23,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
 import WhatsAppButton from './components/WhatsAppButton';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://m-shop-tsrf.onrender.com';
+import { API_BASE_URL } from './config';
 
 // Component responsible for rendering the full-screen loader between route transitions
 function RouteTransitionLoader() {
@@ -32,7 +32,7 @@ function RouteTransitionLoader() {
 
   useEffect(() => {
     setIsTransitioning(true);
-    window.scrollTo(0, 0); 
+    window.scrollTo(0, 0);
     const timer = setTimeout(() => {
       setIsTransitioning(false);
       setTimeout(() => AOS.refresh(), 100);
@@ -56,11 +56,11 @@ function MainLayout({ children, cartCount, products, user, searchTerm, setSearch
   return (
     <div className="min-h-screen bg-gray-50 font-sans selection:bg-orange-200 flex flex-col">
       {!isAdmin && <Navbar cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} setSelectedCategory={setSelectedCategory} />}
-      
+
       <main className="flex-grow relative z-0">
         {children}
       </main>
-      
+
       {!isAdmin && <Footer />}
       {!isAdmin && <WhatsAppButton />}
     </div>
@@ -74,7 +74,7 @@ function App() {
   const [globalLoading, setGlobalLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Cart state 
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('mern_cart');
@@ -109,18 +109,18 @@ function App() {
     localStorage.setItem('mern_token', token);
     localStorage.setItem('mern_user', JSON.stringify(userData));
     setUser(userData);
-    
+
     // Sync local cart to backend if items exist
     const localCart = JSON.parse(localStorage.getItem('mern_cart')) || [];
     try {
       if (localCart.length > 0) {
-        await axios.post(`${API_BASE_URL}/api/cart/sync`, 
-          { items: localCart.map(i => ({ productId: i._id, quantity: i.quantity })) }, 
+        await axios.post(`${API_BASE_URL}/api/cart/sync`,
+          { items: localCart.map(i => ({ productId: i._id, quantity: i.quantity })) },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         localStorage.removeItem('mern_cart');
       }
-      
+
       const res = await axios.get(`${API_BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -176,7 +176,7 @@ function App() {
       }
       return [...prev, { ...product, quantity }];
     });
-    
+
     if (user) {
       try {
         await axios.post(`${API_BASE_URL}/api/cart/add`, { productId: product._id, quantity }, getAuthHeaders());
@@ -187,17 +187,17 @@ function App() {
   const updateCartQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
     setCart(prev => prev.map(item => item._id === productId ? { ...item, quantity: newQuantity } : item));
-    
+
     if (user) {
       try {
         await axios.put(`${API_BASE_URL}/api/cart/update`, { productId, quantity: newQuantity }, getAuthHeaders());
       } catch (err) { console.error('Update cart error:', err); }
     }
   };
-  
+
   const removeFromCart = async (productId) => {
     setCart(prev => prev.filter(item => item._id !== productId));
-    
+
     if (user) {
       try {
         await axios.delete(`${API_BASE_URL}/api/cart/remove/${productId}`, getAuthHeaders());
@@ -209,8 +209,8 @@ function App() {
 
   const displayedProducts = products.filter(p => {
     const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.description && p.description.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 
@@ -236,18 +236,18 @@ function App() {
       )}
       {/* Activates the full-page loader on every navigation routing link clicked */}
       <RouteTransitionLoader />
-      
+
       <MainLayout cartCount={cartCount} products={products} user={user} searchTerm={searchTerm} setSearchTerm={setSearchTerm} handleLogout={handleLogout} setSelectedCategory={setSelectedCategory}>
         <Routes>
           <Route path="/" element={
             <>
-              <Hero 
+              <Hero
                 settings={settings}
-                selectedCategory={selectedCategory} 
-                setSelectedCategory={setSelectedCategory} 
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
               />
-              <ProductList 
-                products={displayedProducts} 
+              <ProductList
+                products={displayedProducts}
                 addToCart={addToCart}
               />
             </>
