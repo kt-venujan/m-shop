@@ -111,7 +111,7 @@ export default function ProductDetails({ products, addToCart }) {
                   ></model-viewer>
                 ) : (
                   product.image ? (
-                    <img src={product.image?.startsWith('/') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" />
+                    <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" />
                   ) : (
                     <span className="text-9xl drop-shadow-lg transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500">
                       {product.category === 'Electronics' ? '💻' : 

@@ -26,7 +26,7 @@ export default function Hero({ settings, selectedCategory, setSelectedCategory }
         {bgImages.map((src, index) => (
           <img 
             key={src}
-            src={src?.startsWith('/') ? API_BASE_URL + src : src} 
+            src={src?.startsWith('/uploads') ? API_BASE_URL + src : src} 
             alt={`E-commerce Background ${index + 1}`} 
             className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${
               index === currentImage ? 'opacity-70 scale-105' : 'opacity-0 scale-100'

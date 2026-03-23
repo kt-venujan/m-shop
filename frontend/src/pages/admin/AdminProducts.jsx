@@ -123,7 +123,7 @@ export default function AdminProducts() {
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-5 py-3 text-sm font-semibold text-gray-900 flex items-center gap-3">
-                  {p.image ? <img src={p.image?.startsWith('/') ? API_BASE_URL + p.image : p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs">No IMG</div>}
+                  {p.image ? <img src={p.image?.startsWith('/uploads') ? API_BASE_URL + p.image : p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover border border-gray-200" /> : <div className="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs">No IMG</div>}
                   {p.name}
                 </td>
                 <td className="px-5 py-3"><span className="text-xs font-bold px-2 py-1 rounded-full bg-orange-100 text-orange-700">{p.category}</span></td>
