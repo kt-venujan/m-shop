@@ -184,7 +184,7 @@ export default function Checkout({ cart, user, clearCart }) {
           <div className="bg-white px-5 py-6 shadow-sm border border-gray-100 h-fit">
             <h2 className="text-gray-800 font-semibold mb-4 text-[13px]">Promotion</h2>
             <div className="flex gap-0 h-10 shadow-sm border border-gray-200 rounded-sm mb-6">
-              <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} placeholder="Enter Store/Daraz Code" className="flex-1 px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a9cb7] rounded-l-sm font-medium" />
+              <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} placeholder="Enter Store/M Code" className="flex-1 px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a9cb7] rounded-l-sm font-medium" />
               <button onClick={handleApplyPromo} className="bg-[#1a9cb7] text-white font-bold text-[12px] px-8 hover:bg-[#128198] transition-colors h-full rounded-r-sm border border-[#1a9cb7]">APPLY</button>
             </div>
             {discount > 0 && <p className="text-green-600 text-xs font-bold mt-[-16px] mb-6">Code saved you Rs. {discount.toFixed(0)}!</p>}
