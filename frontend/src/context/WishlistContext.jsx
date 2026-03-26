@@ -16,11 +16,16 @@ export function WishlistProvider({ children }) {
 
   // Fetch server wishlist on login
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem('mern_token');
+    if (user && token && token !== 'null') {
       axios.get(`${API_BASE_URL}/api/wishlist`, getAuthHeaders())
         .then(res => setWishlist(res.data))
-        .catch(() => {});
-    } else {
+        .catch(err => {
+          if (err.response?.status === 401 || err.response?.status === 400) {
+            console.warn('Auth token invalid for wishlist — skipping server sync.');
+          }
+        });
+    } else if (!user) {
       try {
         setWishlist(JSON.parse(localStorage.getItem('mern_wishlist') || '[]'));
       } catch { setWishlist([]); }

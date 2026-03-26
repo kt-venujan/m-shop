@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
 import { API_BASE_URL } from '../config';
 
 
@@ -71,14 +71,26 @@ export default function ProductDetails({ products, addToCart }) {
   }
 
   const discountPrice = typeof product.price === 'number' ? product.price : parseFloat(product.price || 0);
-  const originalPrice = discountPrice * 2; // Mock original price 50% more
+  const originalPrice = discountPrice * 2;
+
+  // Stock status derived from the product
+  const stock = product.stock;
+  const isOutOfStock = stock !== undefined && stock !== null && stock <= 0;
+  const isLowStock = stock !== undefined && stock !== null && stock > 0 && stock <= 5;
 
   const handleDecrease = () => setQuantity(prev => prev > 1 ? prev - 1 : 1);
   const handleIncrease = () => setQuantity(prev => prev + 1);
 
   const handleBuyNow = () => {
+    if (isOutOfStock) { toast.error('This product is out of stock.'); return; }
     addToCart(product, quantity);
     navigate('/checkout');
+  };
+
+  const handleAddToCart = () => {
+    if (isOutOfStock) { toast.error('This product is out of stock.'); return; }
+    addToCart(product, quantity);
+    toast.success(`${product.name.substring(0, 30)}${product.name.length > 30 ? '...' : ''} added to cart!`);
   };
 
   return (
@@ -111,7 +123,7 @@ export default function ProductDetails({ products, addToCart }) {
                   ></model-viewer>
                 ) : (
                   product.image ? (
-                    <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" />
+                    <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500" loading="lazy" />
                   ) : (
                     <span className="text-9xl drop-shadow-lg transform cursor-zoom-in group-hover:scale-110 transition-transform duration-500">
                       {product.category === 'Electronics' ? '💻' :
@@ -121,6 +133,7 @@ export default function ProductDetails({ products, addToCart }) {
                     </span>
                   )
                 )}
+
 
                 {/* View Mode Toggle Pill */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-md rounded-full shadow-lg p-1 flex gap-1 z-10 border border-gray-200">
@@ -143,6 +156,18 @@ export default function ProductDetails({ products, addToCart }) {
                 <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded pointer-events-none z-20">
                   -50%
                 </div>
+
+                {/* Stock badge */}
+                {isOutOfStock && (
+                  <div className="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded pointer-events-none z-20">
+                    Out of Stock
+                  </div>
+                )}
+                {isLowStock && (
+                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded pointer-events-none z-20">
+                    Only {stock} left!
+                  </div>
+                )}
               </div>
             </div>
 
@@ -199,15 +224,17 @@ export default function ProductDetails({ products, addToCart }) {
                 <div className="flex gap-2 sm:gap-4 mt-auto">
                   <button
                     onClick={handleBuyNow}
-                    className="flex-1 bg-[#2abbe8] hover:bg-[#1bb0da] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#2abbe8] focus:ring-offset-1"
+                    disabled={isOutOfStock}
+                    className={`flex-1 text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-offset-1 ${isOutOfStock ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#2abbe8] hover:bg-[#1bb0da] focus:ring-[#2abbe8]'}`}
                   >
                     Buy Now
                   </button>
                   <button
-                    onClick={() => addToCart(product, quantity)}
-                    className="flex-1 bg-[#f57224] hover:bg-[#e0621b] text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-[#f57224] focus:ring-offset-1"
+                    onClick={handleAddToCart}
+                    disabled={isOutOfStock}
+                    className={`flex-1 text-white font-semibold py-3.5 px-4 rounded shadow-sm transition-colors text-base focus:outline-none focus:ring-2 focus:ring-offset-1 ${isOutOfStock ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#f57224] hover:bg-[#e0621b] focus:ring-[#f57224]'}`}
                   >
-                    Add to Cart
+                    {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                   </button>
                 </div>
               </div>
@@ -378,6 +405,48 @@ export default function ProductDetails({ products, addToCart }) {
         </div>
 
       </div>
+
+      {/* Related Products Section */}
+      {(() => {
+        const related = products
+          .filter(p => p.category === product.category && p._id !== product._id)
+          .slice(0, 6);
+        if (related.length === 0) return null;
+        return (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-4">
+            <h2 className="text-[22px] font-bold text-gray-800 mb-4 border-l-4 border-orange-500 pl-3">
+              Related Products
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-0 bg-white border border-gray-100 shadow-sm divide-x divide-y divide-gray-100">
+              {related.map(rel => {
+                const relImg = rel.image?.startsWith('/uploads') ? API_BASE_URL + rel.image : rel.image;
+                const relPrice = typeof rel.price === 'number' ? rel.price : parseFloat(rel.price || 0);
+                return (
+                  <Link
+                    to={`/product/${rel._id}`}
+                    key={rel._id}
+                    onClick={() => window.scrollTo(0, 0)}
+                    className="p-3 hover:shadow-[0_0_12px_rgba(0,0,0,0.1)] transition-shadow group flex flex-col"
+                  >
+                    <div className="aspect-square mb-2 overflow-hidden bg-gray-50 rounded-md">
+                      {rel.image ? (
+                        <img src={relImg} alt={rel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-3xl bg-gray-50">📦</div>
+                      )}
+                    </div>
+                    <h3 className="text-[12px] text-gray-700 line-clamp-2 leading-tight group-hover:text-orange-500 transition-colors flex-1">{rel.name}</h3>
+                    <div className="mt-1">
+                      <span className="text-orange-500 text-sm font-semibold">Rs.{relPrice.toFixed(0)}</span>
+                      <span className="text-[10px] text-gray-400 line-through ml-1">Rs.{(relPrice * 1.3).toFixed(0)}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {showLocationModal && (
         <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4">

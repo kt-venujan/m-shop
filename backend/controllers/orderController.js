@@ -1,9 +1,34 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 
 // POST /api/orders
 const createOrder = async (req, res) => {
     try {
         const { items, totalAmount, shippingAddress } = req.body;
+
+        // 1. Validate stock for all items before any changes
+        for (const item of items) {
+            const product = await Product.findById(item._id);
+            if (!product) {
+                return res.status(404).json({ message: `Product "${item.name}" no longer exists.` });
+            }
+            if (product.stock !== undefined && product.stock !== null && product.stock < item.quantity) {
+                return res.status(400).json({
+                    message: `"${product.name}" only has ${product.stock} left in stock. Please reduce your quantity.`
+                });
+            }
+        }
+
+        // 2. Decrement stock for each item
+        for (const item of items) {
+            await Product.findByIdAndUpdate(
+                item._id,
+                { $inc: { stock: -item.quantity } },
+                { new: true }
+            );
+        }
+
+        // 3. Create the order
         const newOrder = new Order({
             userId: req.user.id,
             items,

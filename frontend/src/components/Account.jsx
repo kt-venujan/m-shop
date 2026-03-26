@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-
+import toast from 'react-hot-toast';
 import { API_BASE_URL } from '../config';
 
 
@@ -82,17 +82,16 @@ export default function Account({ user, handleLogout }) {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    const toastId = toast.loading('Saving changes...');
     try {
       const res = await axios.put(`${API_BASE_URL}/api/auth/profile`, {
         firstName, lastName, dob, name: username
       }, getAuthHeaders());
-      // Update local storage user state
       localStorage.setItem('mern_user', JSON.stringify(res.data.user));
-      setMessage('Profile updated successfully!');
-      setTimeout(() => setMessage(''), 3000);
-      window.location.reload(); // Quick refresh to update top navbar states
+      toast.success('Profile updated successfully!', { id: toastId });
+      setTimeout(() => window.location.reload(), 800);
     } catch (err) {
-      setMessage('Failed to update profile.');
+      toast.error('Failed to update profile.', { id: toastId });
     }
   };
 
@@ -126,7 +125,7 @@ export default function Account({ user, handleLogout }) {
       setOtpMessage('A 6-digit OTP has been sent to your email to confirm account deletion.');
       setShowOtpModal(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to request OTP');
+      toast.error(err.response?.data?.message || 'Failed to request OTP');
     }
   };
 
@@ -191,9 +190,9 @@ export default function Account({ user, handleLogout }) {
         shippingAddress: newAddress
       }, getAuthHeaders());
       setOrders(orders.map(o => o._id === orderId ? res.data : o));
-      alert("Address updated successfully!");
+      toast.success('Address updated successfully!');
     } catch (err) {
-      alert("Failed to update address. Ensure the order is still Processing.");
+      toast.error('Failed to update address. The order may no longer be in Processing status.');
     }
   };
 

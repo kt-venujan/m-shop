@@ -23,11 +23,23 @@ export function CartProvider({ children }) {
 
   // Fetch server cart whenever user changes (login/logout)
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem('mern_token');
+    if (user && token && token !== 'null') {
       axios.get(`${API_BASE_URL}/api/cart`, getAuthHeaders())
         .then(res => setCart(res.data))
-        .catch(err => console.error('Error fetching cart:', err));
-    } else {
+        .catch(err => {
+          // If the token is invalid/expired, clear stale credentials
+          if (err.response?.status === 401 || err.response?.status === 400) {
+            console.warn('Auth token invalid — clearing stale session.');
+            localStorage.removeItem('mern_token');
+            localStorage.removeItem('mern_user');
+            localStorage.removeItem('mern_cart');
+            setCart([]);
+          } else {
+            console.error('Error fetching cart:', err);
+          }
+        });
+    } else if (!user) {
       // Restore guest cart from localStorage when logged out
       try {
         setCart(JSON.parse(localStorage.getItem('mern_cart') || '[]'));

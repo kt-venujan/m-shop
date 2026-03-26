@@ -20,7 +20,7 @@ const register = async (req, res) => {
         const newUser = new User({ name, email, password: hashedPassword });
         const savedUser = await newUser.save();
 
-        const token = jwt.sign({ id: savedUser._id, isAdmin: savedUser.isAdmin }, 'supersecretkey123', { expiresIn: '1d' });
+        const token = jwt.sign({ id: savedUser._id, isAdmin: savedUser.isAdmin }, process.env.JWT_SECRET || 'supersecretkey123', { expiresIn: '1d' });
         res.json({ token, user: generateResponsePayload(savedUser) });
     } catch (err) {
         res.status(500).json({ message: "Error registering user" });
@@ -37,7 +37,7 @@ const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, 'supersecretkey123', { expiresIn: '1d' });
+        const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET || 'supersecretkey123', { expiresIn: '1d' });
         res.json({ token, user: generateResponsePayload(user) });
     } catch (err) {
         res.status(500).json({ message: "Error logging in" });

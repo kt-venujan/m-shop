@@ -1,15 +1,19 @@
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
 
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization')?.split(' ')[1];
-    if (!token || token === 'null') return res.status(401).json({ message: 'Access Denied' });
+    if (!token || token === 'null' || token === 'undefined') {
+        return res.status(401).json({ message: 'Access Denied: No token provided' });
+    }
 
     try {
-        const verified = jwt.verify(token, 'supersecretkey123');
+        const verified = jwt.verify(token, JWT_SECRET);
         req.user = verified;
         next();
     } catch (err) {
-        res.status(400).json({ message: 'Invalid Token' });
+        // Return 401 (not 400) so the frontend can detect auth failures consistently
+        res.status(401).json({ message: 'Invalid or expired token. Please log in again.' });
     }
 };
 

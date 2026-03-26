@@ -36,7 +36,7 @@ export default function ProductList({ products, addToCart, loading = false }) {
   }
 
   return (
-    <section id="products" className="py-8 bg-[#f5f5f5] min-h-screen">
+    <section id="products" className="py-8 bg-[#f8f9fa] min-h-screen">
       <div className="max-w-[1200px] mx-auto px-0 sm:px-4 space-y-6">
 
         {/* Flash Sale Section */}
@@ -48,9 +48,9 @@ export default function ProductList({ products, addToCart, loading = false }) {
             </div>
           </div>
 
-          <div data-aos="fade-up" data-aos-delay="100" className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100 shadow-sm border-b border-gray-100">
+          <div data-aos="fade-up" data-aos-delay="100" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100 shadow-sm border border-gray-100 rounded-sm overflow-hidden">
             {flashProducts.map(product => (
-              <div key={product._id} className="relative group">
+              <div key={product._id} className="relative group bg-white">
                 {/* Wishlist Heart */}
                 <button
                   onClick={() => toggleWishlist(product)}
@@ -62,7 +62,7 @@ export default function ProductList({ products, addToCart, loading = false }) {
                   </svg>
                 </button>
 
-                <Link to={`/product/${product._id}`} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow block bg-white h-full flex flex-col justify-start">
+                <Link to={`/product/${product._id}`} className="p-3 hover:shadow-[inset_0_0_0_1.5px_#f57224] transition-all block bg-white h-full flex flex-col justify-start">
                   <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">
                     {product.image ? (
                       <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover" />
@@ -87,12 +87,12 @@ export default function ProductList({ products, addToCart, loading = false }) {
         {/* Categories Section */}
         <div>
           <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-6">Categories</h2>
-          <div data-aos="fade-up" data-aos-delay="100" className="bg-white shadow-sm border border-gray-100">
+          <div data-aos="fade-up" data-aos-delay="100" className="shadow-sm border border-gray-100 rounded-sm overflow-hidden">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
               {uniqueCategories.map((category, idx) => {
                 const catProduct = products.find(p => p.category === category);
                 return (
-                  <Link to={`/?category=${encodeURIComponent(category)}`} key={idx} className="flex flex-col items-center justify-center p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow group relative bg-white h-[160px] text-center border-b border-r border-gray-100">
+                  <Link to={`/?category=${encodeURIComponent(category)}`} key={idx} className="flex flex-col items-center justify-center p-3 hover:shadow-[inset_0_0_0_1px_#f57224] transition-all group relative bg-white h-[160px] text-center border-b border-r border-gray-100">
                     <div className="w-[90px] h-[90px] mb-3 overflow-hidden bg-white rounded-md relative z-10 group-hover:scale-105 transition-transform flex-shrink-0 border border-gray-100">
                       {catProduct && catProduct.image ? (
                         <img src={catProduct.image?.startsWith('/uploads') ? API_BASE_URL + catProduct.image : catProduct.image} alt={category} className="w-full h-full object-cover" />
@@ -111,9 +111,9 @@ export default function ProductList({ products, addToCart, loading = false }) {
         {/* Just Picked For You Section */}
         <div>
           <h2 data-aos="fade-right" className="text-[22px] text-gray-700 pb-2 pl-2 sm:pl-0 font-medium tracking-tight mt-8">Just Picked For You</h2>
-          <div data-aos="fade-up" data-aos-delay="100" className="bg-white grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 divide-x divide-y divide-gray-100 shadow-sm border border-gray-100">
+          <div data-aos="fade-up" data-aos-delay="100" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 divide-x divide-y divide-gray-100 shadow-sm border border-gray-100 rounded-sm overflow-hidden">
             {products.map(product => (
-              <div key={product._id} className="relative group">
+              <div key={product._id} className="relative group bg-white">
                 {/* Wishlist Heart */}
                 <button
                   onClick={() => toggleWishlist(product)}
@@ -125,7 +125,7 @@ export default function ProductList({ products, addToCart, loading = false }) {
                   </svg>
                 </button>
 
-                <Link to={`/product/${product._id}`} className="p-3 hover:shadow-[0_0_10px_rgba(0,0,0,0.1)] transition-shadow block bg-white h-full flex flex-col justify-start">
+                <Link to={`/product/${product._id}`} className="p-3 hover:shadow-[inset_0_0_0_1.5px_#f57224] transition-all block bg-white h-full flex flex-col justify-start">
                   <div className="aspect-square mb-2 relative overflow-hidden bg-white rounded-md">
                     {product.image ? (
                       <img src={product.image?.startsWith('/uploads') ? API_BASE_URL + product.image : product.image} alt={product.name} className="w-full h-full object-cover" />
