@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product', default: [] }],
   otpCode: { type: String, default: null },
   otpExpires: { type: Date, default: null },
   createdAt: { type: Date, default: Date.now }

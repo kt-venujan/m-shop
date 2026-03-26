@@ -11,6 +11,8 @@ const uploadRoutes = require('./routes/uploadRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
+const errorMiddleware = require('./middleware/errorMiddleware');
 const path = require('path');
 
 const app = express();
@@ -37,9 +39,13 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Serve images statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
+// Centralized error handler (must be last)
+app.use(errorMiddleware);
 
 // Start Server
 app.listen(5000, () => {

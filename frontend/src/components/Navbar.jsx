@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useWishlist } from '../context/WishlistContext';
 
 export default function Navbar({ cartCount = 0, products = [], user = null, searchTerm = '', setSearchTerm, handleLogout }) {
   const navigate = useNavigate();
@@ -8,6 +9,8 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
   const [isScrolled, setIsScrolled] = useState(false);
   const [hideCategory, setHideCategory] = useState(false);
   const searchRef = useRef(null);
+  const { wishlist } = useWishlist();
+  const wishlistCount = wishlist.length;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -157,6 +160,16 @@ export default function Navbar({ cartCount = 0, products = [], user = null, sear
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></span>
                 </Link>
               )}
+
+              {/* Wishlist Icon */}
+              <Link to="/wishlist" className="relative font-bold text-black hover:text-orange-600 flex items-center gap-1 transition-all hover:scale-105 duration-300" title="Wishlist">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center">{wishlistCount}</span>
+                )}
+              </Link>
 
               <Link to="/cart" className="font-bold text-black hover:text-orange-600 flex items-center gap-1 transition-all hover:scale-105 duration-300 uppercase tracking-wide text-sm group">
                 <span className="hidden sm:inline">Cart</span>
