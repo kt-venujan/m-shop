@@ -12,6 +12,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const couponRoutes = require('./routes/couponRoutes');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const path = require('path');
 
@@ -40,6 +41,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/coupons', couponRoutes);
 
 // Serve images statically
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

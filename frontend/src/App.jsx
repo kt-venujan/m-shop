@@ -21,6 +21,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReviews from './pages/admin/AdminReviews';
+import AdminCoupons from './pages/admin/AdminCoupons';
 import WhatsAppButton from './components/WhatsAppButton';
 import Wishlist from './pages/Wishlist';
 
@@ -176,6 +177,7 @@ function AppRoutes() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="coupons" element={<AdminCoupons />} />
           </Route>
         </Routes>
       </MainLayout>

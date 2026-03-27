@@ -15,7 +15,10 @@ export default function Checkout({ cart, user, clearCart }) {
   });
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [promoCode, setPromoCode] = useState('');
+  const [couponId, setCouponId] = useState(null);
   const [discount, setDiscount] = useState(0);
+  const [discountLabel, setDiscountLabel] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isPlacing, setIsPlacing] = useState(false);
 
@@ -23,14 +26,26 @@ export default function Checkout({ cart, user, clearCart }) {
   const deliveryFee = cart.length > 0 ? 360 : 0;
   const total = subtotal + deliveryFee - discount;
 
-  const handleApplyPromo = () => {
-    if (promoCode.trim().length > 0) {
-      setDiscount(subtotal * 0.1);
-      toast.success(`Promo applied! You saved Rs. ${(subtotal * 0.1).toFixed(0)}`);
-    } else {
-      setDiscount(0);
-      toast.error('Please enter a promo code.');
-    }
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) { toast.error('Please enter a promo code.'); return; }
+    setPromoLoading(true);
+    try {
+      const token = localStorage.getItem('mern_token');
+      const res = await axios.post(`${API_BASE_URL}/api/coupons/validate`,
+        { code: promoCode.trim(), cartTotal: subtotal },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setDiscount(res.data.discount);
+      setCouponId(res.data.couponId);
+      const label = res.data.discountType === 'percentage'
+        ? `${res.data.discountValue}% off`
+        : `Rs. ${res.data.discountValue} off`;
+      setDiscountLabel(`${res.data.code} — ${label}`);
+      toast.success(`Coupon applied! You saved Rs. ${res.data.discount.toFixed(0)}`);
+    } catch (err) {
+      setDiscount(0); setCouponId(null); setDiscountLabel('');
+      toast.error(err.response?.data?.message || 'Invalid coupon code.');
+    } finally { setPromoLoading(false); }
   };
 
   const handleCheckout = async () => {
@@ -52,7 +67,8 @@ export default function Checkout({ cart, user, clearCart }) {
       const orderData = {
         items: cart,
         totalAmount: total,
-        shippingAddress: `${customer.name} (${customer.phone}) - ${customer.label}: ${customer.address}`
+        shippingAddress: `${customer.name} (${customer.phone}) - ${customer.label}: ${customer.address}`,
+        couponId: couponId || undefined,
       };
 
       await axios.post(`${API_BASE_URL}/api/orders`, orderData, {
@@ -189,10 +205,11 @@ export default function Checkout({ cart, user, clearCart }) {
           {/* Promotion / Voucher */}
           <div className="bg-white px-5 py-6 shadow-sm border border-gray-100 h-fit">
             <h2 className="text-gray-800 font-semibold mb-4 text-[13px]">Promotion</h2>
-            <div className="flex gap-0 h-10 shadow-sm border border-gray-200 rounded-sm mb-6">
-              <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} placeholder="Enter promo code" className="flex-1 px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a9cb7] rounded-l-sm font-medium" />
-              <button onClick={handleApplyPromo} className="bg-[#1a9cb7] text-white font-bold text-[12px] px-8 hover:bg-[#128198] transition-colors h-full rounded-r-sm border border-[#1a9cb7]">APPLY</button>
+            <div className="flex gap-0 h-10 shadow-sm border border-gray-200 rounded-sm mb-4">
+              <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} placeholder="Enter promo code" className="flex-1 px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a9cb7] rounded-l-sm font-mono font-bold uppercase" />
+              <button onClick={handleApplyPromo} disabled={promoLoading} className="bg-[#1a9cb7] text-white font-bold text-[12px] px-8 hover:bg-[#128198] transition-colors h-full rounded-r-sm border border-[#1a9cb7] disabled:opacity-60">{promoLoading ? '...' : 'APPLY'}</button>
             </div>
+            {discountLabel && <p className="text-green-600 text-xs font-bold mb-4">✓ {discountLabel} applied!</p>}
 
             <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
               <h2 className="text-gray-600 font-medium text-[13px]">Invoice and Contact Info</h2>
@@ -215,7 +232,7 @@ export default function Checkout({ cart, user, clearCart }) {
               </div>
               {discount > 0 && (
                 <div className="flex justify-between items-end mt-3 text-green-600">
-                  <span>Promo Discount (-10%)</span>
+                  <span>{discountLabel || 'Promo Discount'}</span>
                   <span className="font-bold text-[14px]">- Rs. {discount.toFixed(0)}</span>
                 </div>
               )}

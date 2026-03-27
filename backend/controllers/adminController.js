@@ -1,6 +1,7 @@
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const User = require('../models/User');
+const { sendStatusUpdate } = require('../services/emailService');
 
 // GET /api/admin/stats
 const getStats = async (req, res) => {
@@ -34,6 +35,19 @@ const updateOrderStatus = async (req, res) => {
             { status: req.body.status },
             { new: true }
         );
+        if (!updated) return res.status(404).json({ message: 'Order not found' });
+
+        // Send status update email (non-blocking)
+        const user = await User.findById(updated.userId).select('email name');
+        if (user?.email) {
+            sendStatusUpdate({
+                toEmail: user.email,
+                toName: user.name,
+                orderId: updated._id,
+                status: req.body.status,
+            });
+        }
+
         res.json(updated);
     } catch (err) {
         res.status(500).json({ message: "Error updating order status" });

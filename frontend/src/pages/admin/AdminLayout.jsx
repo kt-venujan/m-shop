@@ -12,6 +12,7 @@ export default function AdminLayout() {
     { name: 'Dashboard', path: '/admin' },
     { name: 'Products', path: '/admin/products' },
     { name: 'Orders', path: '/admin/orders' },
+    { name: 'Coupons', path: '/admin/coupons' },
     { name: 'Customers', path: '/admin/users' },
     { name: 'Reviews', path: '/admin/reviews' },
     { name: 'Site Settings', path: '/admin/settings' },

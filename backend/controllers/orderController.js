@@ -1,10 +1,13 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const User = require('../models/User');
+const { useCoupon } = require('./couponController');
+const { sendOrderConfirmation } = require('../services/emailService');
 
 // POST /api/orders
 const createOrder = async (req, res) => {
     try {
-        const { items, totalAmount, shippingAddress } = req.body;
+        const { items, totalAmount, shippingAddress, couponId } = req.body;
 
         // 1. Validate stock for all items before any changes
         for (const item of items) {
@@ -33,9 +36,25 @@ const createOrder = async (req, res) => {
             userId: req.user.id,
             items,
             totalAmount,
-            shippingAddress
+            shippingAddress,
         });
         const savedOrder = await newOrder.save();
+
+        // 4. Increment coupon usage if one was applied
+        if (couponId) {
+            await useCoupon(couponId);
+        }
+
+        // 5. Send confirmation email (non-blocking)
+        const user = await User.findById(req.user.id).select('email name');
+        if (user?.email) {
+            sendOrderConfirmation({
+                toEmail: user.email,
+                toName: user.name,
+                order: savedOrder,
+            });
+        }
+
         res.json(savedOrder);
     } catch (err) {
         res.status(500).json({ message: "Error creating order" });
@@ -65,7 +84,7 @@ const updateOrder = async (req, res) => {
         if (req.body.shippingAddress) {
             order.shippingAddress = req.body.shippingAddress;
         }
-        
+
         const updatedOrder = await order.save();
         res.json(updatedOrder);
     } catch (err) {
